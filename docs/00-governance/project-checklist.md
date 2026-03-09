@@ -26,8 +26,8 @@
 - [x] Define node type registry
 - [x] Build ReactFlow-based editor skeleton
 - [x] Build node config side panel
-- [ ] Build edge and validation behavior
-- [ ] Add workflow versioning strategy
+- [x] Build edge and validation behavior
+- [x] Add workflow versioning strategy
 
 ## Execution engine
 

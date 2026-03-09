@@ -13,6 +13,10 @@ import {
 
 interface EditorToolbarProps {
   workflowName: string
+  isDirty?: boolean
+  hasErrors?: boolean
+  hasWarnings?: boolean
+  version?: number
   onSave: () => void
   onRun: () => void
   onZoomIn: () => void
@@ -22,6 +26,10 @@ interface EditorToolbarProps {
 
 export function EditorToolbar({
   workflowName,
+  isDirty = false,
+  hasErrors = false,
+  hasWarnings = false,
+  version = 0,
   onSave,
   onRun,
   onZoomIn,
@@ -51,6 +59,28 @@ export function EditorToolbar({
         <div className="flex items-center gap-2">
           <Icon icon="lucide:workflow" className="h-4 w-4 text-primary" />
           <span className="font-medium">{workflowName}</span>
+          {version > 0 && (
+            <span className="text-xs text-muted-foreground">v{version}</span>
+          )}
+          {isDirty && (
+            <span className="text-xs text-yellow-500">{t("unsaved")}</span>
+          )}
+          {hasErrors && (
+            <Tooltip>
+              <TooltipTrigger>
+                <Icon icon="lucide:alert-circle" className="h-4 w-4 text-destructive" />
+              </TooltipTrigger>
+              <TooltipContent>{t("hasErrors")}</TooltipContent>
+            </Tooltip>
+          )}
+          {hasWarnings && !hasErrors && (
+            <Tooltip>
+              <TooltipTrigger>
+                <Icon icon="lucide:alert-triangle" className="h-4 w-4 text-yellow-500" />
+              </TooltipTrigger>
+              <TooltipContent>{t("hasWarnings")}</TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </div>
 
@@ -87,12 +117,12 @@ export function EditorToolbar({
 
         <Separator orientation="vertical" className="mx-2 h-6" />
 
-        <Button variant="outline" size="sm" onClick={onSave}>
+        <Button variant={isDirty ? "default" : "outline"} size="sm" onClick={onSave}>
           <Icon icon="lucide:save" className="mr-2 h-4 w-4" />
           {t("save")}
         </Button>
 
-        <Button size="sm" onClick={onRun}>
+        <Button size="sm" onClick={onRun} disabled={hasErrors}>
           <Icon icon="lucide:play" className="mr-2 h-4 w-4" />
           {t("run")}
         </Button>

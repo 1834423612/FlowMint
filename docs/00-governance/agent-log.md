@@ -19,6 +19,45 @@
 
 ## Entries
 
+## 2026-03-09 Session 3
+- Agent: v0 (Claude Opus 4.6)
+- Scope: 边缘验证行为与工作流版本控制
+- Completed:
+  - 创建完整的工作流验证系统 (lib/workflow/validators.ts)
+    - 连接规则验证（节点类别兼容性、输入/输出检查）
+    - 图结构验证（检测循环、孤立节点、缺失触发器）
+    - 节点配置验证（必填字段、类型特定验证）
+  - 创建工作流版本控制系统 (lib/workflow/versioning.ts)
+    - 版本快照创建与管理
+    - 版本比较与差异计算
+    - 未保存更改检测
+    - 工作流序列化/反序列化
+  - 扩展 workflow-store.ts 集成验证与版本控制
+    - 新增 isDirty、validation、currentVersion 等状态
+    - 新增 isValidConnection、validate、saveVersion、revertToVersion 等操作
+  - 更新 EditorToolbar 显示保存状态和验证状态
+  - ReactFlow 集成连接验证（isValidConnection 回调）
+- Files created:
+  - lib/workflow/validators.ts
+  - lib/workflow/versioning.ts
+- Files modified:
+  - stores/workflow-store.ts（重构集成验证和版本控制）
+  - components/editor/workflow-canvas.tsx（传递验证状态）
+  - components/editor/editor-toolbar.tsx（显示状态指示器）
+  - messages/zh.json（添加 unsaved、hasErrors、hasWarnings 翻译）
+  - messages/en.json（添加 unsaved、hasErrors、hasWarnings 翻译）
+  - docs/00-governance/project-checklist.md
+- Risks / blockers:
+  - 版本历史目前存储在内存中，需要后端 API 持久化
+  - 验证规则可能需要根据实际业务需求调整
+- Recommended next step:
+  - 实现执行引擎运行时接口（Define runtime contracts）
+  - 或添加初始示例数据行（Add initial example data rows）
+- Checklist updated: Yes
+- Review needed: No（核心逻辑模块，建议后续集成测试）
+
+---
+
 ## 2026-03-09 Session 2
 - Agent: v0 (Claude Opus 4.6)
 - Scope: AI 提供商设置页面

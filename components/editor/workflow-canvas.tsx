@@ -37,11 +37,17 @@ export function WorkflowCanvas({ workflowName }: WorkflowCanvasProps) {
     nodes,
     edges,
     selectedNodeId,
+    isDirty,
+    validation,
+    currentVersion,
     onNodesChange,
     onEdgesChange,
     onConnect,
+    isValidConnection,
     addNode,
     setSelectedNodeId,
+    saveVersion,
+    validate,
   } = useWorkflowStore()
 
   const selectedNode = useMemo(
@@ -107,18 +113,32 @@ export function WorkflowCanvas({ workflowName }: WorkflowCanvasProps) {
   }, [setSelectedNodeId])
 
   const handleSave = useCallback(() => {
-    const workflow = { nodes, edges }
-    console.log("Saving workflow:", workflow)
-  }, [nodes, edges])
+    const validationResult = validate()
+    if (!validationResult.isValid) {
+      console.warn("Workflow validation failed:", validationResult.errors)
+      // Could show a toast notification here
+    }
+    const version = saveVersion("current-user", "Manual save")
+    console.log("Saved workflow version:", version)
+  }, [validate, saveVersion])
 
   const handleRun = useCallback(() => {
-    console.log("Running workflow")
-  }, [])
+    const validationResult = validate()
+    if (!validationResult.isValid) {
+      console.error("Cannot run workflow with errors:", validationResult.errors)
+      return
+    }
+    console.log("Running workflow with validation:", validationResult)
+  }, [validate])
 
   return (
     <div className="flex h-screen flex-col">
       <EditorToolbar
         workflowName={workflowName}
+        isDirty={isDirty}
+        hasErrors={validation ? validation.errors.length > 0 : false}
+        hasWarnings={validation ? validation.warnings.length > 0 : false}
+        version={currentVersion}
         onSave={handleSave}
         onRun={handleRun}
         onZoomIn={() => zoomIn()}
@@ -136,6 +156,7 @@ export function WorkflowCanvas({ workflowName }: WorkflowCanvasProps) {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            isValidConnection={isValidConnection}
             onDrop={onDrop}
             onDragOver={onDragOver}
             onNodeClick={onNodeClick}

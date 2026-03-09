@@ -89,6 +89,9 @@
     "nodeLibrary": "Node Library",
     "inspector": "Inspector",
     "minimap": "Minimap",
+    "unsaved": "Unsaved",
+    "hasErrors": "Workflow has errors",
+    "hasWarnings": "Workflow has warnings",
     "categories": {
       "trigger": "Triggers",
       "browser": "Browser",

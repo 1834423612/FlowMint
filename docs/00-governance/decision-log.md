@@ -16,6 +16,22 @@
 
 ## Entries
 
+### Decision 2026-03-09-005
+- Title: 工作流验证采用分层验证策略
+- Status: accepted
+- Context: 工作流编辑器需要在用户操作时提供即时反馈，同时在保存和运行前确保工作流的完整性。
+- Decision: 实现三层验证：1) 连接验证（实时，在拖拽连线时）2) 图结构验证（保存时，检测循环、孤立节点）3) 配置验证（运行前，检查必填字段）。区分 error 和 warning 级别。
+- Consequences: 用户获得即时反馈；阻止无效连接；允许保存有警告的工作流但阻止运行有错误的工作流。
+- Related files: `lib/workflow/validators.ts`, `stores/workflow-store.ts`
+
+### Decision 2026-03-09-006
+- Title: 工作流版本采用快照式版本控制
+- Status: accepted
+- Context: 需要支持工作流的版本历史、回滚和变更追踪，但不需要复杂的分支合并。
+- Decision: 每次保存创建完整快照（节点、边、元数据的深拷贝），支持版本比较和回滚。版本号采用递增整数，状态分为 draft/published/archived。
+- Consequences: 简单可靠的版本管理；易于实现回滚；为未来的协作功能预留扩展点。
+- Related files: `lib/workflow/versioning.ts`, `stores/workflow-store.ts`
+
 ### Decision 2026-03-09-001
 - Title: 采用 Tailwind CSS 4 + CSS 变量深色主题系统
 - Status: accepted

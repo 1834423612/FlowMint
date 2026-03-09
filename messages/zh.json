@@ -89,6 +89,9 @@
     "nodeLibrary": "节点库",
     "inspector": "属性检查器",
     "minimap": "小地图",
+    "unsaved": "未保存",
+    "hasErrors": "工作流存在错误",
+    "hasWarnings": "工作流存在警告",
     "categories": {
       "trigger": "触发器",
       "browser": "浏览器",
