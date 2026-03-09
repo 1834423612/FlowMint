@@ -1,0 +1,198 @@
+{
+  "common": {
+    "appName": "FlowMint",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "run": "Run",
+    "stop": "Stop",
+    "retry": "Retry",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "actions": "Actions",
+    "status": "Status",
+    "name": "Name",
+    "description": "Description",
+    "createdAt": "Created At",
+    "updatedAt": "Updated At",
+    "noData": "No Data",
+    "settings": "Settings"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "workflows": "Workflows",
+    "executions": "Executions",
+    "settings": "Settings",
+    "help": "Help",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "overview": "Overview",
+    "totalWorkflows": "Total Workflows",
+    "activeWorkflows": "Active Workflows",
+    "totalExecutions": "Total Executions",
+    "successRate": "Success Rate",
+    "recentExecutions": "Recent Executions",
+    "quickActions": "Quick Actions",
+    "createWorkflow": "Create Workflow",
+    "viewAll": "View All",
+    "noRecentExecutions": "No recent executions"
+  },
+  "workflows": {
+    "title": "Workflows",
+    "subtitle": "Manage your automation workflows",
+    "create": "New Workflow",
+    "import": "Import Workflow",
+    "search": "Search workflows...",
+    "empty": "No workflows",
+    "emptyDescription": "Create your first workflow to start automating browser tasks",
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "paused": "Paused",
+      "archived": "Archived"
+    },
+    "actions": {
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "export": "Export",
+      "delete": "Delete",
+      "run": "Run"
+    },
+    "deleteConfirm": {
+      "title": "Delete Workflow",
+      "description": "Are you sure you want to delete this workflow? This action cannot be undone."
+    }
+  },
+  "editor": {
+    "title": "Workflow Editor",
+    "save": "Save",
+    "run": "Run",
+    "undo": "Undo",
+    "redo": "Redo",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "fitView": "Fit View",
+    "nodeLibrary": "Node Library",
+    "inspector": "Inspector",
+    "minimap": "Minimap",
+    "categories": {
+      "trigger": "Triggers",
+      "browser": "Browser",
+      "page": "Page Actions",
+      "data": "Data Processing",
+      "flow": "Flow Control",
+      "ai": "AI Capabilities"
+    },
+    "nodes": {
+      "trigger": {
+        "manual": "Manual Trigger",
+        "schedule": "Scheduled Trigger",
+        "webhook": "Webhook"
+      },
+      "browser": {
+        "openBrowser": "Open Browser",
+        "closeBrowser": "Close Browser",
+        "newTab": "New Tab",
+        "closeTab": "Close Tab",
+        "navigate": "Navigate to URL"
+      },
+      "page": {
+        "click": "Click Element",
+        "type": "Type Text",
+        "scroll": "Scroll Page",
+        "screenshot": "Screenshot",
+        "waitFor": "Wait for Element",
+        "extractText": "Extract Text",
+        "extractData": "Extract Data"
+      },
+      "data": {
+        "setVariable": "Set Variable",
+        "transform": "Transform Data",
+        "filter": "Filter Data",
+        "aggregate": "Aggregate Data",
+        "httpRequest": "HTTP Request"
+      },
+      "flow": {
+        "condition": "Condition",
+        "loop": "Loop",
+        "delay": "Delay",
+        "parallel": "Parallel Execution",
+        "subWorkflow": "Sub Workflow"
+      },
+      "ai": {
+        "llmChat": "AI Chat",
+        "textClassify": "Text Classification",
+        "entityExtract": "Entity Extraction",
+        "sentiment": "Sentiment Analysis"
+      }
+    },
+    "inspector": {
+      "noSelection": "Select a node to view and edit its properties",
+      "nodeId": "Node ID",
+      "nodeType": "Node Type",
+      "properties": "Properties"
+    }
+  },
+  "executions": {
+    "title": "Executions",
+    "subtitle": "View workflow execution history",
+    "search": "Search executions...",
+    "empty": "No executions",
+    "emptyDescription": "Run a workflow and execution records will appear here",
+    "status": {
+      "pending": "Pending",
+      "running": "Running",
+      "success": "Success",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    },
+    "columns": {
+      "workflow": "Workflow",
+      "status": "Status",
+      "startedAt": "Started At",
+      "duration": "Duration",
+      "trigger": "Trigger"
+    },
+    "details": {
+      "title": "Execution Details",
+      "logs": "Execution Logs",
+      "result": "Result",
+      "error": "Error"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "appearance": "Appearance",
+    "language": "Language",
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "account": "Account",
+    "security": "Security",
+    "apiKeys": "API Keys",
+    "integrations": "Integrations",
+    "themes": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
+  "user": {
+    "profile": "Profile",
+    "preferences": "Preferences",
+    "logout": "Logout"
+  }
+}

@@ -1,0 +1,198 @@
+{
+  "common": {
+    "appName": "FlowMint",
+    "loading": "加载中...",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "search": "搜索",
+    "filter": "筛选",
+    "export": "导出",
+    "import": "导入",
+    "run": "运行",
+    "stop": "停止",
+    "retry": "重试",
+    "confirm": "确认",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "close": "关闭",
+    "actions": "操作",
+    "status": "状态",
+    "name": "名称",
+    "description": "描述",
+    "createdAt": "创建时间",
+    "updatedAt": "更新时间",
+    "noData": "暂无数据",
+    "settings": "设置"
+  },
+  "nav": {
+    "dashboard": "仪表盘",
+    "workflows": "工作流",
+    "executions": "执行历史",
+    "settings": "设置",
+    "help": "帮助",
+    "logout": "退出登录"
+  },
+  "dashboard": {
+    "title": "仪表盘",
+    "welcome": "欢迎回来",
+    "overview": "概览",
+    "totalWorkflows": "工作流总数",
+    "activeWorkflows": "活跃工作流",
+    "totalExecutions": "执行总数",
+    "successRate": "成功率",
+    "recentExecutions": "最近执行",
+    "quickActions": "快捷操作",
+    "createWorkflow": "创建工作流",
+    "viewAll": "查看全部",
+    "noRecentExecutions": "暂无最近执行记录"
+  },
+  "workflows": {
+    "title": "工作流",
+    "subtitle": "管理您的自动化工作流",
+    "create": "新建工作流",
+    "import": "导入工作流",
+    "search": "搜索工作流...",
+    "empty": "暂无工作流",
+    "emptyDescription": "创建您的第一个工作流，开始自动化浏览器任务",
+    "status": {
+      "draft": "草稿",
+      "active": "活跃",
+      "paused": "已暂停",
+      "archived": "已归档"
+    },
+    "actions": {
+      "edit": "编辑",
+      "duplicate": "复制",
+      "export": "导出",
+      "delete": "删除",
+      "run": "运行"
+    },
+    "deleteConfirm": {
+      "title": "删除工作流",
+      "description": "确定要删除此工作流吗？此操作无法撤销。"
+    }
+  },
+  "editor": {
+    "title": "工作流编辑器",
+    "save": "保存",
+    "run": "运行",
+    "undo": "撤销",
+    "redo": "重做",
+    "zoomIn": "放大",
+    "zoomOut": "缩小",
+    "fitView": "适应视图",
+    "nodeLibrary": "节点库",
+    "inspector": "属性检查器",
+    "minimap": "小地图",
+    "categories": {
+      "trigger": "触发器",
+      "browser": "浏览器",
+      "page": "页面操作",
+      "data": "数据处理",
+      "flow": "流程控制",
+      "ai": "AI 能力"
+    },
+    "nodes": {
+      "trigger": {
+        "manual": "手动触发",
+        "schedule": "定时触发",
+        "webhook": "Webhook"
+      },
+      "browser": {
+        "openBrowser": "打开浏览器",
+        "closeBrowser": "关闭浏览器",
+        "newTab": "新建标签页",
+        "closeTab": "关闭标签页",
+        "navigate": "导航到 URL"
+      },
+      "page": {
+        "click": "点击元素",
+        "type": "输入文本",
+        "scroll": "滚动页面",
+        "screenshot": "截图",
+        "waitFor": "等待元素",
+        "extractText": "提取文本",
+        "extractData": "提取数据"
+      },
+      "data": {
+        "setVariable": "设置变量",
+        "transform": "数据转换",
+        "filter": "数据筛选",
+        "aggregate": "数据聚合",
+        "httpRequest": "HTTP 请求"
+      },
+      "flow": {
+        "condition": "条件分支",
+        "loop": "循环",
+        "delay": "延迟",
+        "parallel": "并行执行",
+        "subWorkflow": "子工作流"
+      },
+      "ai": {
+        "llmChat": "AI 对话",
+        "textClassify": "文本分类",
+        "entityExtract": "实体提取",
+        "sentiment": "情感分析"
+      }
+    },
+    "inspector": {
+      "noSelection": "选择一个节点来查看和编辑其属性",
+      "nodeId": "节点 ID",
+      "nodeType": "节点类型",
+      "properties": "属性"
+    }
+  },
+  "executions": {
+    "title": "执行历史",
+    "subtitle": "查看工作流执行记录",
+    "search": "搜索执行记录...",
+    "empty": "暂无执行记录",
+    "emptyDescription": "运行工作流后，执行记录将显示在这里",
+    "status": {
+      "pending": "等待中",
+      "running": "运行中",
+      "success": "成功",
+      "failed": "失败",
+      "cancelled": "已取消"
+    },
+    "columns": {
+      "workflow": "工作流",
+      "status": "状态",
+      "startedAt": "开始时间",
+      "duration": "耗时",
+      "trigger": "触发方式"
+    },
+    "details": {
+      "title": "执行详情",
+      "logs": "执行日志",
+      "result": "执行结果",
+      "error": "错误信息"
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "general": "通用设置",
+    "appearance": "外观",
+    "language": "语言",
+    "theme": "主题",
+    "notifications": "通知",
+    "account": "账户",
+    "security": "安全",
+    "apiKeys": "API 密钥",
+    "integrations": "集成",
+    "themes": {
+      "light": "浅色",
+      "dark": "深色",
+      "system": "跟随系统"
+    }
+  },
+  "user": {
+    "profile": "个人资料",
+    "preferences": "偏好设置",
+    "logout": "退出登录"
+  }
+}
