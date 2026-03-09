@@ -79,6 +79,8 @@
   },
   "editor": {
     "title": "工作流编辑器",
+    "newWorkflowName": "新建工作流",
+    "workflowNamePrefix": "工作流",
     "save": "保存",
     "run": "运行",
     "undo": "撤销",
@@ -212,6 +214,7 @@
     "connectionSuccess": "连接成功",
     "connectionFailed": "连接失败",
     "apiKey": "API 密钥",
+    "providerType": "提供商类型",
     "apiKeyPlaceholder": "输入您的 API 密钥",
     "baseUrl": "Base URL",
     "baseUrlPlaceholder": "可选，自定义 API 端点",

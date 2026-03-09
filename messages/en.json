@@ -79,6 +79,8 @@
   },
   "editor": {
     "title": "Workflow Editor",
+    "newWorkflowName": "New Workflow",
+    "workflowNamePrefix": "Workflow",
     "save": "Save",
     "run": "Run",
     "undo": "Undo",
@@ -212,6 +214,7 @@
     "connectionSuccess": "Connection Successful",
     "connectionFailed": "Connection Failed",
     "apiKey": "API Key",
+    "providerType": "Provider Type",
     "apiKeyPlaceholder": "Enter your API key",
     "baseUrl": "Base URL",
     "baseUrlPlaceholder": "Optional, custom API endpoint",

@@ -83,6 +83,7 @@ const mockProviders: ProviderConfig[] = [
 
 export function ProvidersContent() {
   const t = useTranslations("providers")
+  const tCommon = useTranslations("common")
   const [providers, setProviders] = useState<ProviderConfig[]>(mockProviders)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [selectedType, setSelectedType] = useState<ProviderType>("openai")
@@ -152,7 +153,7 @@ export function ProvidersContent() {
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label>Provider Type</Label>
+                <Label>{t("providerType")}</Label>
                 <Select value={selectedType} onValueChange={(v) => setSelectedType(v as ProviderType)}>
                   <SelectTrigger>
                     <SelectValue />
@@ -209,7 +210,7 @@ export function ProvidersContent() {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                {t("../common.cancel")}
+                {tCommon("cancel")}
               </Button>
               <Button onClick={handleAddProvider} disabled={!apiKey}>
                 {t("addProvider")}
@@ -224,13 +225,12 @@ export function ProvidersContent() {
           icon="lucide:cpu"
           title={t("empty")}
           description={t("emptyDescription")}
-          action={
-            <Button onClick={() => setIsAddDialogOpen(true)}>
-              <Icon icon="lucide:plus" className="mr-2 h-4 w-4" />
-              {t("addProvider")}
-            </Button>
-          }
-        />
+        >
+          <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Icon icon="lucide:plus" className="mr-2 h-4 w-4" />
+            {t("addProvider")}
+          </Button>
+        </EmptyState>
       ) : (
         <div className="grid gap-4">
           {providers.map(provider => (
@@ -313,7 +313,7 @@ export function ProvidersContent() {
                     onClick={() => handleDelete(provider.id)}
                   >
                     <Icon icon="lucide:trash-2" className="mr-2 h-4 w-4" />
-                    {t("../common.delete")}
+                    {tCommon("delete")}
                   </Button>
                 </div>
               </CardContent>

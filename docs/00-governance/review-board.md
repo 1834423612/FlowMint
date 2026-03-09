@@ -19,6 +19,35 @@
 
 ## Entries
 
+## Review 2026-03-09 - 已知报错修复与自纠错审批
+- Reviewer: Codex (GPT-5.3-Codex)
+- Scope reviewed: providers i18n、workflow editor route、ReactFlow 连接类型、validators 类型安全
+- Files reviewed:
+  - components/providers/providers-content.tsx
+  - app/(app)/workflows/[id]/page.tsx
+  - stores/workflow-store.ts
+  - lib/workflow/validators.ts
+  - messages/zh.json
+  - messages/en.json
+- Findings:
+  - Severity: High
+  - Issue: providers 页面使用 `t("../common.cancel")` 与 `t("../common.delete")`，导致 `MISSING_MESSAGE` 运行时报错
+  - Suggested fix: 使用独立命名空间 `useTranslations("common")` 读取公共文案
+  - Severity: High
+  - Issue: `WorkflowEditorPage` 作为 Client Component 却为 `async`，触发 React/Next 运行时错误与 Suspense promise 警告
+  - Suggested fix: 移除 `"use client"`，改为服务端页面包装客户端画布
+  - Severity: High
+  - Issue: `isValidConnection` 回调签名与 ReactFlow `IsValidConnection<Edge>` 不匹配，构建失败
+  - Suggested fix: 使用 `IsValidConnection<Edge>` 类型并兼容 `Edge | Connection`
+  - Severity: Medium
+  - Issue: `validateNodeConfig` 对 `unknown` 配置字段直接做数值比较，类型不安全且会导致编译错误
+  - Suggested fix: 增加显式类型收窄（`hasText` / `getNumber`）
+  - Severity: Low
+  - Issue: editor 页面标题存在硬编码英文，不符合 i18n 规范
+  - Suggested fix: 增加翻译键并改为 `getTranslations("editor")`
+- Overall result: PASS（所有已知错误修复后，`pnpm build` 已通过）
+- Follow-up owner: 下一个 Agent 执行 architecture/UI consistency 复审
+
 ## Review 2026-03-09 - 初始架构自审
 - Reviewer: v0 (Claude Opus 4.6) - 自审
 - Scope reviewed: 项目初始化与核心 UI 框架

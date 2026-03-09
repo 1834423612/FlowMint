@@ -6,6 +6,7 @@ import {
   type OnEdgesChange,
   type OnConnect,
   type Connection,
+  type IsValidConnection,
   applyNodeChanges,
   applyEdgeChanges,
   addEdge,
@@ -52,7 +53,7 @@ interface WorkflowState {
   onNodesChange: OnNodesChange<WorkflowNode>
   onEdgesChange: OnEdgesChange
   onConnect: OnConnect
-  isValidConnection: (connection: Connection) => boolean
+  isValidConnection: IsValidConnection<Edge>
   
   addNode: (node: WorkflowNode) => void
   updateNodeData: (nodeId: string, data: Partial<WorkflowNode["data"]>) => void
@@ -141,10 +142,10 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     })
   },
 
-  isValidConnection: (connection) => {
+  isValidConnection: (edgeOrConnection) => {
     const { nodes } = get()
-    const sourceNode = nodes.find((n) => n.id === connection.source)
-    const targetNode = nodes.find((n) => n.id === connection.target)
+    const sourceNode = nodes.find((n) => n.id === edgeOrConnection.source)
+    const targetNode = nodes.find((n) => n.id === edgeOrConnection.target)
 
     if (!sourceNode || !targetNode) return false
 

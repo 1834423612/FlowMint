@@ -220,10 +220,13 @@ function validateNodeConfig(node: WorkflowNode): ValidationResult {
   const warnings: ValidationMessage[] = []
   const config = node.data.config || {}
 
+  const hasText = (value: unknown) => typeof value === "string" && value.trim().length > 0
+  const getNumber = (value: unknown) => (typeof value === "number" ? value : Number.NaN)
+
   // Type-specific validations
   switch (node.data.type) {
     case "navigate":
-      if (!config.url) {
+      if (!hasText(config.url)) {
         errors.push({
           code: "MISSING_URL",
           message: `Navigate node "${node.data.label}" requires a URL`,
@@ -236,7 +239,7 @@ function validateNodeConfig(node: WorkflowNode): ValidationResult {
 
     case "click":
     case "type":
-      if (!config.selector) {
+      if (!hasText(config.selector)) {
         warnings.push({
           code: "MISSING_SELECTOR",
           message: `Node "${node.data.label}" has no selector configured`,
@@ -245,10 +248,8 @@ function validateNodeConfig(node: WorkflowNode): ValidationResult {
           severity: "warning",
         })
       }
-      break
 
-    case "type":
-      if (!config.text && !config.variable) {
+      if (node.data.type === "type" && !hasText(config.text) && !hasText(config.variable)) {
         warnings.push({
           code: "MISSING_TEXT",
           message: `Type node "${node.data.label}" has no text or variable configured`,
@@ -260,7 +261,7 @@ function validateNodeConfig(node: WorkflowNode): ValidationResult {
       break
 
     case "llm_chat":
-      if (!config.prompt && !config.promptVariable) {
+      if (!hasText(config.prompt) && !hasText(config.promptVariable)) {
         warnings.push({
           code: "MISSING_PROMPT",
           message: `LLM Chat node "${node.data.label}" has no prompt configured`,
@@ -272,7 +273,7 @@ function validateNodeConfig(node: WorkflowNode): ValidationResult {
       break
 
     case "condition":
-      if (!config.condition) {
+      if (!hasText(config.condition)) {
         errors.push({
           code: "MISSING_CONDITION",
           message: `Condition node "${node.data.label}" requires a condition expression`,
@@ -284,7 +285,7 @@ function validateNodeConfig(node: WorkflowNode): ValidationResult {
       break
 
     case "delay":
-      if (!config.duration || config.duration <= 0) {
+      if (getNumber(config.duration) <= 0) {
         warnings.push({
           code: "INVALID_DELAY",
           message: `Delay node "${node.data.label}" has invalid duration`,
@@ -296,7 +297,7 @@ function validateNodeConfig(node: WorkflowNode): ValidationResult {
       break
 
     case "http_request":
-      if (!config.url) {
+      if (!hasText(config.url)) {
         errors.push({
           code: "MISSING_URL",
           message: `HTTP Request node "${node.data.label}" requires a URL`,

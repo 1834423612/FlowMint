@@ -51,6 +51,7 @@
 - [x] Start `agent-log.md`
 - [x] Start `review-board.md`
 - [x] Start `decision-log.md`
+- [x] Complete first known-error self-correction pass (build + i18n + editor runtime)
 - [ ] Run first architecture review
 - [ ] Run first UI consistency review
-- [ ] Run first i18n review
+- [x] Run first i18n review

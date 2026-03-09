@@ -19,6 +19,36 @@
 
 ## Entries
 
+## 2026-03-09 Session 4
+- Agent: Codex (GPT-5.3-Codex)
+- Scope: 首轮全局自纠错审批（优先修复已知控制台与构建报错）
+- Completed:
+  - 修复 providers 页面 i18n 命名空间错误（`t("../common.*")` -> `useTranslations("common")`）
+  - 修复 providers 对话框硬编码文案并补齐中英文翻译键
+  - 修复 `WorkflowEditorPage` 异步客户端组件错误：改为服务端页面并保留 `params` Promise 签名
+  - 修复 ReactFlow `isValidConnection` 类型签名不匹配（兼容 `Edge | Connection`）
+  - 修复 `EmptyState` 调用与组件 props 不一致的类型错误
+  - 修复 `validators.ts` 中 `config.duration` 等 `unknown` 值比较导致的类型错误，并消除重复 `switch case`
+  - 对工作流页面标题进行 i18n 化，移除硬编码英文
+  - 通过 `pnpm build` 全量验证（编译、类型检查、静态页面生成全部通过）
+- Files created:
+  - 无
+- Files modified:
+  - app/(app)/workflows/[id]/page.tsx
+  - components/providers/providers-content.tsx
+  - stores/workflow-store.ts
+  - lib/workflow/validators.ts
+  - messages/zh.json
+  - messages/en.json
+  - docs/00-governance/project-checklist.md
+  - docs/00-governance/agent-log.md
+- Risks / blockers:
+  - Next 构建阶段仍有来自 `next-intl` 的 webpack cache warning（非阻塞，当前不影响产物正确性）
+- Recommended next step:
+  - 执行“first architecture review”与“first UI consistency review”两项未完成治理任务
+- Checklist updated: Yes
+- Review needed: Yes（建议由另一个模型做交叉复审）
+
 ## 2026-03-09 Session 3
 - Agent: v0 (Claude Opus 4.6)
 - Scope: 边缘验证行为与工作流版本控制
