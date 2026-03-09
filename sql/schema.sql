@@ -1,0 +1,23 @@
+-- Merged initialization schema
+-- This is a starter placeholder and should be expanded safely over time.
+
+CREATE TABLE IF NOT EXISTS app_user (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  display_name VARCHAR(120) NULL,
+  locale VARCHAR(10) NOT NULL DEFAULT 'zh',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS workflow (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  owner_user_id BIGINT NOT NULL,
+  slug VARCHAR(120) NOT NULL UNIQUE,
+  name VARCHAR(255) NOT NULL,
+  status VARCHAR(40) NOT NULL DEFAULT 'draft',
+  latest_version_no INT NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_workflow_owner FOREIGN KEY (owner_user_id) REFERENCES app_user(id)
+);
