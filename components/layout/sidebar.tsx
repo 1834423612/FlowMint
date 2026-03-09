@@ -15,6 +15,7 @@ const navItems = [
   { href: "/dashboard", icon: "lucide:layout-dashboard", labelKey: "dashboard" },
   { href: "/workflows", icon: "lucide:git-branch", labelKey: "workflows" },
   { href: "/executions", icon: "lucide:history", labelKey: "executions" },
+  { href: "/providers", icon: "lucide:cpu", labelKey: "providers" },
   { href: "/settings", icon: "lucide:settings", labelKey: "settings" },
 ]
 

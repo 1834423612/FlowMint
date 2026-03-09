@@ -32,6 +32,7 @@
     "dashboard": "仪表盘",
     "workflows": "工作流",
     "executions": "执行历史",
+    "providers": "AI 提供商",
     "settings": "设置",
     "help": "帮助",
     "logout": "退出登录"
@@ -194,5 +195,49 @@
     "profile": "个人资料",
     "preferences": "偏好设置",
     "logout": "退出登录"
+  },
+  "providers": {
+    "title": "AI 提供商",
+    "subtitle": "管理您的 AI 模型提供商配置",
+    "addProvider": "添加提供商",
+    "configured": "已配置",
+    "notConfigured": "未配置",
+    "default": "默认",
+    "setAsDefault": "设为默认",
+    "testConnection": "测试连接",
+    "testing": "测试中...",
+    "connectionSuccess": "连接成功",
+    "connectionFailed": "连接失败",
+    "apiKey": "API 密钥",
+    "apiKeyPlaceholder": "输入您的 API 密钥",
+    "baseUrl": "Base URL",
+    "baseUrlPlaceholder": "可选，自定义 API 端点",
+    "models": "可用模型",
+    "selectModel": "选择模型",
+    "defaultModel": "默认模型",
+    "providerTypes": {
+      "openai": "OpenAI",
+      "anthropic": "Anthropic",
+      "google": "Google AI",
+      "azure": "Azure OpenAI",
+      "deepseek": "DeepSeek",
+      "ollama": "Ollama",
+      "custom": "自定义"
+    },
+    "providerDescriptions": {
+      "openai": "GPT-4o、GPT-4、GPT-3.5 系列模型",
+      "anthropic": "Claude 3.5、Claude 3 系列模型",
+      "google": "Gemini Pro、Gemini Flash 系列模型",
+      "azure": "Azure 托管的 OpenAI 模型",
+      "deepseek": "DeepSeek V3、DeepSeek Coder 模型",
+      "ollama": "本地运行的开源模型",
+      "custom": "自定义 OpenAI 兼容 API"
+    },
+    "empty": "暂无配置的提供商",
+    "emptyDescription": "添加 AI 提供商以启用智能工作流功能",
+    "deleteConfirm": {
+      "title": "删除提供商",
+      "description": "确定要删除此提供商配置吗？相关的工作流可能会受到影响。"
+    }
   }
 }

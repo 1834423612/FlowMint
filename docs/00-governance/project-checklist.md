@@ -17,7 +17,7 @@
 - [x] Workflows list page
 - [x] Workflow editor shell
 - [x] Execution history page
-- [ ] Provider settings page
+- [x] Provider settings page
 - [x] Account and auth settings page
 
 ## Workflow system
