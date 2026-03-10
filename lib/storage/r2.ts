@@ -9,10 +9,12 @@ export class R2Storage {
     private readonly client: S3Client | null
     private readonly bucket: string
     private readonly publicBaseUrl?: string
+    private readonly rootFolder?: string
 
     constructor() {
         this.bucket = process.env.R2_BUCKET || ""
         this.publicBaseUrl = process.env.R2_PUBLIC_BASE_URL
+        this.rootFolder = this.normalizeFolder(process.env.R2_ROOT_FOLDER)
 
         const accountId = process.env.R2_ACCOUNT_ID
         const accessKeyId = process.env.R2_ACCESS_KEY_ID
@@ -30,23 +32,42 @@ export class R2Storage {
         })
     }
 
+    private normalizeFolder(folder?: string): string | undefined {
+        if (!folder) {
+            return undefined
+        }
+
+        const normalized = folder.trim().replace(/^\/+|\/+$/g, "")
+        return normalized || undefined
+    }
+
+    private buildObjectKey(key: string): string {
+        const normalizedKey = key.replace(/^\/+/, "")
+        if (!this.rootFolder) {
+            return normalizedKey
+        }
+        return `${this.rootFolder}/${normalizedKey}`
+    }
+
     async putBuffer(key: string, body: Buffer, contentType: string): Promise<StoredObject> {
         if (!this.client) {
             throw new Error("R2 storage is not configured")
         }
 
+        const objectKey = this.buildObjectKey(key)
+
         await this.client.send(
             new PutObjectCommand({
                 Bucket: this.bucket,
-                Key: key,
+                Key: objectKey,
                 Body: body,
                 ContentType: contentType,
             })
         )
 
         return {
-            key,
-            publicUrl: this.publicBaseUrl ? `${this.publicBaseUrl.replace(/\/$/, "")}/${key}` : undefined,
+            key: objectKey,
+            publicUrl: this.publicBaseUrl ? `${this.publicBaseUrl.replace(/\/$/, "")}/${objectKey}` : undefined,
         }
     }
 }
