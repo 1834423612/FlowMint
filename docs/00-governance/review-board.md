@@ -19,6 +19,40 @@
 
 ## Entries
 
+## Review 2026-03-09 - 后端系统逻辑首轮代码复审
+
+- Reviewer: Codex (GPT-5.3-Codex)
+- Scope reviewed: Prisma + API routes + runtime/task runner + Playwright/Stagehand + provider/storage abstraction
+- Files reviewed:
+  - prisma/schema.prisma
+  - lib/db/prisma.ts
+  - lib/runtime/types.ts
+  - lib/runtime/workflow-runtime.ts
+  - lib/execution/task-runner.ts
+  - lib/browser/playwright-runner.ts
+  - lib/browser/stagehand-runner.ts
+  - lib/providers/openai-compatible.ts
+  - app/api/workflows/route.ts
+  - app/api/workflows/[id]/route.ts
+  - app/api/workflows/[id]/run/route.ts
+  - app/api/executions/route.ts
+  - app/api/executions/[id]/route.ts
+  - app/api/providers/route.ts
+  - sql/schema.sql
+  - sql/seed.sql
+- Findings:
+  - Severity: Medium
+  - Issue: provider `encryptedApiKey` 当前仍是占位实现（未做真实加密）
+  - Suggested fix: 接入 KMS/密钥派生加密流程，至少在存储前进行应用层加密
+  - Severity: Low
+  - Issue: Stagehand 采用动态探测并回退 Playwright，尚未接入真实 Stagehand API
+  - Suggested fix: 增加 stagehand package 后实现独立执行适配器与特定能力映射
+  - Severity: Low
+  - Issue: Runtime 当前为顺序执行队列，未实现并行节点调度策略
+  - Suggested fix: 下一阶段按 DAG 拓扑层并行执行并增加并发限制
+- Overall result: PASS（MVP 后端闭环已可用，存在可接受的低/中优先后续项）
+- Follow-up owner: 下一个 backend agent
+
 ## Review 2026-03-09 - UI 一致性复审（删除确认与文案国际化）
 
 - Reviewer: Codex (GPT-5.3-Codex)

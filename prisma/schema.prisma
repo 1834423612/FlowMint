@@ -1,0 +1,222 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum WorkflowStatus {
+  draft
+  active
+  paused
+  archived
+}
+
+enum WorkflowRunStatus {
+  queued
+  running
+  success
+  failed
+  cancelled
+}
+
+enum ProviderType {
+  openai
+  anthropic
+  openrouter
+  azure
+  deepseek
+  ollama
+  custom
+}
+
+enum ProviderProtocol {
+  openai_compatible
+  anthropic_compatible
+}
+
+enum AssetType {
+  screenshot
+  artifact
+}
+
+model User {
+  id          BigInt      @id @default(autoincrement())
+  email       String      @unique @db.VarChar(255)
+  displayName String?     @map("display_name") @db.VarChar(120)
+  locale      String      @default("zh") @db.VarChar(10)
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  authIdentities      AuthIdentity[]
+  providerAccounts    ProviderAccount[]
+  workflows           Workflow[]
+  workflowRuns        WorkflowRun[]       @relation("UserWorkflowRuns")
+  environmentProfiles EnvironmentProfile[]
+  reviewNotes         ReviewNote[]
+
+  @@map("app_user")
+}
+
+model AuthIdentity {
+  id             BigInt   @id @default(autoincrement())
+  userId         BigInt   @map("user_id")
+  provider       String   @db.VarChar(50)
+  providerUserId String   @map("provider_user_id") @db.VarChar(255)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+  @@map("auth_identity")
+}
+
+model ProviderAccount {
+  id               BigInt            @id @default(autoincrement())
+  userId           BigInt            @map("user_id")
+  name             String            @db.VarChar(120)
+  type             ProviderType
+  protocol         ProviderProtocol  @default(openai_compatible)
+  isDefault        Boolean           @default(false) @map("is_default")
+  baseUrl          String?           @map("base_url") @db.VarChar(512)
+  encryptedApiKey  String            @map("encrypted_api_key") @db.Text
+  defaultModel     String?           @map("default_model") @db.VarChar(120)
+  metadata         Json?
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("provider_account")
+}
+
+model Workflow {
+  id               BigInt          @id @default(autoincrement())
+  ownerUserId      BigInt          @map("owner_user_id")
+  slug             String          @unique @db.VarChar(120)
+  name             String          @db.VarChar(255)
+  status           WorkflowStatus  @default(draft)
+  latestVersionNo  Int             @default(1) @map("latest_version_no")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  owner    User              @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  versions WorkflowVersion[]
+  runs     WorkflowRun[]
+
+  @@index([ownerUserId])
+  @@map("workflow")
+}
+
+model WorkflowVersion {
+  id          BigInt    @id @default(autoincrement())
+  workflowId  BigInt    @map("workflow_id")
+  versionNo   Int       @map("version_no")
+  graph       Json
+  changelog   String?   @db.Text
+  createdBy   BigInt?   @map("created_by")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  workflow Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+
+  @@unique([workflowId, versionNo])
+  @@index([workflowId])
+  @@map("workflow_version")
+}
+
+model WorkflowRun {
+  id                 BigInt             @id @default(autoincrement())
+  workflowId         BigInt             @map("workflow_id")
+  workflowVersionId  BigInt?            @map("workflow_version_id")
+  triggerType        String             @default("manual") @map("trigger_type") @db.VarChar(40)
+  status             WorkflowRunStatus  @default(queued)
+  startedAt          DateTime?          @map("started_at")
+  finishedAt         DateTime?          @map("finished_at")
+  errorMessage       String?            @map("error_message") @db.Text
+  logs               Json?
+  metadata           Json?
+  createdBy          BigInt?            @map("created_by")
+  createdAt          DateTime           @default(now()) @map("created_at")
+
+  workflow Workflow          @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  creator  User?             @relation("UserWorkflowRuns", fields: [createdBy], references: [id], onDelete: SetNull)
+  steps    WorkflowRunStep[]
+  assets   Asset[]
+
+  @@index([workflowId])
+  @@index([status])
+  @@map("workflow_run")
+}
+
+model WorkflowRunStep {
+  id           BigInt            @id @default(autoincrement())
+  workflowRunId BigInt           @map("workflow_run_id")
+  nodeId       String            @map("node_id") @db.VarChar(120)
+  nodeType     String            @map("node_type") @db.VarChar(80)
+  status       WorkflowRunStatus @default(queued)
+  attempts     Int               @default(0)
+  input        Json?
+  output       Json?
+  errorMessage String?           @map("error_message") @db.Text
+  startedAt    DateTime?         @map("started_at")
+  finishedAt   DateTime?         @map("finished_at")
+  createdAt    DateTime          @default(now()) @map("created_at")
+
+  run WorkflowRun @relation(fields: [workflowRunId], references: [id], onDelete: Cascade)
+
+  @@index([workflowRunId])
+  @@map("workflow_run_step")
+}
+
+model Asset {
+  id            BigInt    @id @default(autoincrement())
+  workflowRunId BigInt?   @map("workflow_run_id")
+  type          AssetType
+  bucket        String    @db.VarChar(120)
+  objectKey     String    @map("object_key") @db.VarChar(512)
+  publicUrl     String?   @map("public_url") @db.VarChar(1024)
+  metadata      Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  run WorkflowRun? @relation(fields: [workflowRunId], references: [id], onDelete: SetNull)
+
+  @@index([workflowRunId])
+  @@map("asset")
+}
+
+model EnvironmentProfile {
+  id            BigInt   @id @default(autoincrement())
+  userId        BigInt   @map("user_id")
+  name          String   @db.VarChar(120)
+  isActive      Boolean  @default(false) @map("is_active")
+  variablesJson Json     @map("variables_json")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("environment_profile")
+}
+
+model ReviewNote {
+  id          BigInt   @id @default(autoincrement())
+  workflowId  BigInt?  @map("workflow_id")
+  runId       BigInt?  @map("run_id")
+  authorUserId BigInt? @map("author_user_id")
+  sourceModel String?  @map("source_model") @db.VarChar(120)
+  severity    String   @default("info") @db.VarChar(40)
+  content     String   @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [authorUserId], references: [id], onDelete: SetNull)
+
+  @@index([workflowId])
+  @@index([runId])
+  @@map("review_note")
+}

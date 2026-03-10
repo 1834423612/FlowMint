@@ -31,12 +31,12 @@
 
 ## Execution engine
 
-- [ ] Define runtime contracts
-- [ ] Add Playwright integration layer
-- [ ] Add Stagehand integration layer
-- [ ] Add AI planning service interface
-- [ ] Add execution logs and screenshots flow
-- [ ] Add error handling and retry policy
+- [x] Define runtime contracts
+- [x] Add Playwright integration layer
+- [x] Add Stagehand integration layer
+- [x] Add AI planning service interface
+- [x] Add execution logs and screenshots flow
+- [x] Add error handling and retry policy
 
 ## Data layer
 
@@ -44,7 +44,7 @@
 - [x] Define SQL delivery rules
 - [x] Create merged `/sql/schema.sql`
 - [x] Create merged `/sql/seed.sql`
-- [ ] Add initial example data rows
+- [x] Add initial example data rows
 
 ## Quality and governance
 
