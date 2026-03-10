@@ -216,6 +216,47 @@
     "security": "Security",
     "apiKeys": "API Keys",
     "integrations": "Integrations",
+    "descriptions": {
+      "language": "Select your preferred language",
+      "apiKeys": "Manage your API keys for external integrations",
+      "theme": "Customize the appearance of the application",
+      "notifications": "Configure how you receive notifications",
+      "security": "Manage your account security settings"
+    },
+    "apiKeyCards": {
+      "production": {
+        "title": "Production API Key",
+        "masked": "fm_prod_**********************",
+        "copy": "Copy"
+      },
+      "generateNew": "Generate New Key"
+    },
+    "notificationItems": {
+      "workflowCompletion": {
+        "title": "Workflow Completion",
+        "description": "Get notified when a workflow finishes running"
+      },
+      "workflowFailures": {
+        "title": "Workflow Failures",
+        "description": "Get notified when a workflow fails"
+      },
+      "emailNotifications": {
+        "title": "Email Notifications",
+        "description": "Receive notifications via email"
+      }
+    },
+    "securityItems": {
+      "password": {
+        "title": "Password",
+        "lastChanged": "Last changed 30 days ago",
+        "change": "Change"
+      },
+      "twoFactor": {
+        "title": "Two-Factor Authentication",
+        "description": "Add an extra layer of security",
+        "enable": "Enable"
+      }
+    },
     "themes": {
       "light": "Light",
       "dark": "Dark",

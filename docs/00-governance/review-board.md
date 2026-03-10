@@ -19,6 +19,32 @@
 
 ## Entries
 
+## Review 2026-03-09 - UI 一致性复审（删除确认与文案国际化）
+
+- Reviewer: Codex (GPT-5.3-Codex)
+- Scope reviewed: 首次 UI 审查高优先问题整改验证
+- Files reviewed:
+  - components/providers/providers-content.tsx
+  - components/workflows/workflow-card.tsx
+  - components/editor/node-inspector.tsx
+  - components/layout/header.tsx
+  - app/(app)/executions/page.tsx
+  - components/settings/settings-content.tsx
+  - messages/zh.json
+  - messages/en.json
+- Findings:
+  - Severity: Resolved
+  - Issue: 删除操作缺少二次确认
+  - Suggested fix: 已落实（provider/workflow/node 删除均有确认弹窗）
+  - Severity: Resolved
+  - Issue: 关键 UI 交互文案硬编码
+  - Suggested fix: 已落实（迁移到 i18n keys）
+  - Severity: Residual Low
+  - Issue: 主题主色仍偏绿色，与 style-guide 的 indigo/blue 方向存在偏差
+  - Suggested fix: 后续单独进行 design token 调整并做全页视觉回归
+- Overall result: PASS with residual low risk
+- Follow-up owner: 下一个 Agent（design token 统一调整）
+
 ## Review 2026-03-09 - 首次架构一致性审查
 
 - Reviewer: Codex (GPT-5.3-Codex)

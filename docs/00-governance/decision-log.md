@@ -16,6 +16,14 @@
 
 ## Entries
 
+### Decision 2026-03-09-008
+- Title: 统一破坏性操作二次确认并清理核心硬编码交互文案
+- Status: accepted
+- Context: 首次 UI 一致性审查指出删除操作缺乏确认流程，且关键交互文案存在硬编码，违反 style-guide 与 i18n 纪律。
+- Decision: 所有高频破坏性操作（provider/workflow/node 删除）统一接入确认弹窗；关键界面交互文案必须通过 `messages/zh|en.json` 维护。
+- Consequences: 降低误删风险，提升 UI 行为一致性，减少跨语言扩展时的返工。
+- Related files: `components/providers/providers-content.tsx`, `components/workflows/workflow-card.tsx`, `components/editor/node-inspector.tsx`, `messages/zh.json`, `messages/en.json`
+
 ### Decision 2026-03-09-007
 - Title: 将 Next.js 升级到 16.1.6 以满足 Vercel CVE 安全门禁
 - Status: accepted

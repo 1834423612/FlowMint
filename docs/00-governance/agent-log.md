@@ -19,6 +19,35 @@
 
 ## Entries
 
+## 2026-03-09 Session 6
+- Agent: Codex (GPT-5.3-Codex)
+- Scope: 续作修复（删除确认统一 + 硬编码文案 i18n 清理）
+- Completed:
+  - 为 provider 删除、workflow 删除、node 删除统一接入二次确认弹窗
+  - 清理 `header`、`executions`、`workflow-card`、`node-inspector` 中核心硬编码文案并迁移至 i18n
+  - 补齐 `messages/zh.json` 与 `messages/en.json` 相关翻译键（inspector/settings/executions/user/workflows）
+  - 清理 `settings-content.tsx` 的剩余硬编码文案并完成国际化
+  - 执行 `pnpm build`，构建与类型检查通过
+- Files created:
+  - 无
+- Files modified:
+  - components/providers/providers-content.tsx
+  - components/workflows/workflow-card.tsx
+  - components/editor/node-inspector.tsx
+  - components/layout/header.tsx
+  - app/(app)/executions/page.tsx
+  - components/settings/settings-content.tsx
+  - messages/zh.json
+  - messages/en.json
+  - docs/00-governance/project-checklist.md
+  - docs/00-governance/agent-log.md
+- Risks / blockers:
+  - 仍存在部分示例数据文案为静态内容（非交互文案），后续接入真实数据后可统一收敛
+- Recommended next step:
+  - 开始架构整改第一步：建立 `features/*` 与 `lib/runtime|browser|providers|db|storage` 模块骨架
+- Checklist updated: Yes
+- Review needed: Yes（建议进行一次 UI consistency follow-up 复审）
+
 ## 2026-03-09 Session 5
 - Agent: Codex (GPT-5.3-Codex)
 - Scope: Vercel 构建拦截修复（Next.js CVE）+ 首次架构/UI 治理审查落地

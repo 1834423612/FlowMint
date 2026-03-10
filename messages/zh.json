@@ -216,6 +216,47 @@
     "security": "安全",
     "apiKeys": "API 密钥",
     "integrations": "集成",
+    "descriptions": {
+      "language": "选择您偏好的界面语言",
+      "apiKeys": "管理用于外部集成的 API 密钥",
+      "theme": "自定义应用外观",
+      "notifications": "配置您接收通知的方式",
+      "security": "管理您的账户安全设置"
+    },
+    "apiKeyCards": {
+      "production": {
+        "title": "生产环境 API 密钥",
+        "masked": "fm_prod_**********************",
+        "copy": "复制"
+      },
+      "generateNew": "生成新密钥"
+    },
+    "notificationItems": {
+      "workflowCompletion": {
+        "title": "工作流完成",
+        "description": "当工作流执行完成时通知我"
+      },
+      "workflowFailures": {
+        "title": "工作流失败",
+        "description": "当工作流执行失败时通知我"
+      },
+      "emailNotifications": {
+        "title": "邮件通知",
+        "description": "通过电子邮件接收通知"
+      }
+    },
+    "securityItems": {
+      "password": {
+        "title": "密码",
+        "lastChanged": "上次修改于 30 天前",
+        "change": "修改"
+      },
+      "twoFactor": {
+        "title": "双因素认证",
+        "description": "为账户增加额外安全保护",
+        "enable": "启用"
+      }
+    },
     "themes": {
       "light": "浅色",
       "dark": "深色",

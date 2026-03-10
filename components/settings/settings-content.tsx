@@ -62,7 +62,7 @@ export function SettingsContent() {
           <Card>
             <CardHeader>
               <CardTitle>{t("language")}</CardTitle>
-              <CardDescription>Select your preferred language</CardDescription>
+              <CardDescription>{t("descriptions.language")}</CardDescription>
             </CardHeader>
             <CardContent>
               <Select
@@ -87,7 +87,7 @@ export function SettingsContent() {
           <Card>
             <CardHeader>
               <CardTitle>{t("apiKeys")}</CardTitle>
-              <CardDescription>Manage your API keys for external integrations</CardDescription>
+              <CardDescription>{t("descriptions.apiKeys")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between rounded-lg border border-border p-4">
@@ -96,18 +96,18 @@ export function SettingsContent() {
                     <Icon icon="lucide:key" className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="font-medium">Production API Key</p>
-                    <p className="text-sm text-muted-foreground">fm_prod_**********************</p>
+                    <p className="font-medium">{t("apiKeyCards.production.title")}</p>
+                    <p className="text-sm text-muted-foreground">{t("apiKeyCards.production.masked")}</p>
                   </div>
                 </div>
                 <Button variant="outline" size="sm">
                   <Icon icon="lucide:copy" className="mr-2 h-4 w-4" />
-                  Copy
+                  {t("apiKeyCards.production.copy")}
                 </Button>
               </div>
               <Button variant="outline">
                 <Icon icon="lucide:plus" className="mr-2 h-4 w-4" />
-                Generate New Key
+                {t("apiKeyCards.generateNew")}
               </Button>
             </CardContent>
           </Card>
@@ -117,7 +117,7 @@ export function SettingsContent() {
           <Card>
             <CardHeader>
               <CardTitle>{t("theme")}</CardTitle>
-              <CardDescription>Customize the appearance of the application</CardDescription>
+              <CardDescription>{t("descriptions.theme")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
@@ -130,7 +130,7 @@ export function SettingsContent() {
                   <span className="text-sm font-medium">{t("themes.light")}</span>
                 </div>
                 <div className="flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-border p-4 opacity-50">
-                  <div className="h-20 w-full rounded-md bg-gradient-to-b from-zinc-100 to-zinc-900" />
+                  <div className="h-20 w-full rounded-md bg-linear-to-b from-zinc-100 to-zinc-900" />
                   <span className="text-sm font-medium">{t("themes.system")}</span>
                 </div>
               </div>
@@ -142,14 +142,14 @@ export function SettingsContent() {
           <Card>
             <CardHeader>
               <CardTitle>{t("notifications")}</CardTitle>
-              <CardDescription>Configure how you receive notifications</CardDescription>
+              <CardDescription>{t("descriptions.notifications")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Workflow Completion</Label>
+                  <Label>{t("notificationItems.workflowCompletion.title")}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Get notified when a workflow finishes running
+                    {t("notificationItems.workflowCompletion.description")}
                   </p>
                 </div>
                 <Switch defaultChecked />
@@ -157,9 +157,9 @@ export function SettingsContent() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Workflow Failures</Label>
+                  <Label>{t("notificationItems.workflowFailures.title")}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Get notified when a workflow fails
+                    {t("notificationItems.workflowFailures.description")}
                   </p>
                 </div>
                 <Switch defaultChecked />
@@ -167,9 +167,9 @@ export function SettingsContent() {
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Email Notifications</Label>
+                  <Label>{t("notificationItems.emailNotifications.title")}</Label>
                   <p className="text-sm text-muted-foreground">
-                    Receive notifications via email
+                    {t("notificationItems.emailNotifications.description")}
                   </p>
                 </div>
                 <Switch />
@@ -182,7 +182,7 @@ export function SettingsContent() {
           <Card>
             <CardHeader>
               <CardTitle>{t("security")}</CardTitle>
-              <CardDescription>Manage your account security settings</CardDescription>
+              <CardDescription>{t("descriptions.security")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between rounded-lg border border-border p-4">
@@ -191,12 +191,12 @@ export function SettingsContent() {
                     <Icon icon="lucide:lock" className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="font-medium">Password</p>
-                    <p className="text-sm text-muted-foreground">Last changed 30 days ago</p>
+                    <p className="font-medium">{t("securityItems.password.title")}</p>
+                    <p className="text-sm text-muted-foreground">{t("securityItems.password.lastChanged")}</p>
                   </div>
                 </div>
                 <Button variant="outline" size="sm">
-                  Change
+                  {t("securityItems.password.change")}
                 </Button>
               </div>
               <div className="flex items-center justify-between rounded-lg border border-border p-4">
@@ -205,12 +205,12 @@ export function SettingsContent() {
                     <Icon icon="lucide:smartphone" className="h-5 w-5 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="font-medium">Two-Factor Authentication</p>
-                    <p className="text-sm text-muted-foreground">Add an extra layer of security</p>
+                    <p className="font-medium">{t("securityItems.twoFactor.title")}</p>
+                    <p className="text-sm text-muted-foreground">{t("securityItems.twoFactor.description")}</p>
                   </div>
                 </div>
                 <Button variant="outline" size="sm">
-                  Enable
+                  {t("securityItems.twoFactor.enable")}
                 </Button>
               </div>
             </CardContent>

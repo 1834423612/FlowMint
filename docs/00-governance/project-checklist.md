@@ -55,3 +55,4 @@
 - [x] Run first architecture review
 - [x] Run first UI consistency review
 - [x] Run first i18n review
+- [x] Unify destructive-action confirmation and remove key hardcoded UI copy
