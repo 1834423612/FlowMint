@@ -1,4 +1,5 @@
 export type RuntimeNodeType =
+    | "Noop"
     | "OpenURL"
     | "Click"
     | "Type"

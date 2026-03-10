@@ -17,7 +17,7 @@ export default function WorkflowEditorPage({ params }: WorkflowEditorPageProps) 
   const t = useTranslations("editor")
   const router = useRouter()
   
-  const { workflows, getWorkflow, createWorkflow } = useWorkflowsStore()
+  const { fetchWorkflowDetail, createWorkflow } = useWorkflowsStore()
   const [isLoading, setIsLoading] = useState(true)
   const [workflowData, setWorkflowData] = useState<{
     id: string
@@ -48,8 +48,8 @@ export default function WorkflowEditorPage({ params }: WorkflowEditorPageProps) 
         // Update URL to reflect the new ID
         router.replace(`/workflows/${newWorkflow.id}`)
       } else {
-        // Load existing workflow
-        const workflow = getWorkflow(id)
+        // Load existing workflow from API detail to ensure latest graph is available
+        const workflow = await fetchWorkflowDetail(id)
         if (workflow) {
           setWorkflowData({
             id: workflow.id,
@@ -67,7 +67,7 @@ export default function WorkflowEditorPage({ params }: WorkflowEditorPageProps) 
     }
     
     loadWorkflow()
-  }, [id, getWorkflow, createWorkflow, router, t])
+  }, [id, fetchWorkflowDetail, createWorkflow, router, t])
 
   if (isLoading || !workflowData) {
     return (

@@ -127,6 +127,13 @@ export class WorkflowRuntime {
                 let output: unknown
 
                 switch (normalizedType) {
+                    case "Noop": {
+                        output = {
+                            skipped: true,
+                            originalType: node.data.type || node.type,
+                        }
+                        break
+                    }
                     case "OpenURL": {
                         const url = String(readConfigValue(node, "url", ""))
                         if (!url) throw new Error("url is required")

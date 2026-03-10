@@ -52,6 +52,7 @@ export function WorkflowCanvasWrapper({
   const { saveWorkflowGraph, updateWorkflow, runWorkflow } = useWorkflowsStore()
   
   const [workflowName, setWorkflowName] = useState(initialWorkflowName)
+  const [savedWorkflowName, setSavedWorkflowName] = useState(initialWorkflowName)
   const [isSaving, setIsSaving] = useState(false)
   const [isRunning, setIsRunning] = useState(false)
 
@@ -71,6 +72,7 @@ export function WorkflowCanvasWrapper({
     validate,
     loadWorkflow,
     initializeWorkflow,
+    markAsSaved,
   } = useWorkflowStore()
 
   // Initialize the workflow store with the loaded data
@@ -161,12 +163,15 @@ export function WorkflowCanvasWrapper({
     )
     
     // Update workflow name if changed
-    if (workflowName !== initialWorkflowName) {
-      updateWorkflow(workflowId, { name: workflowName })
+    if (workflowName !== savedWorkflowName) {
+      await updateWorkflow(workflowId, { name: workflowName })
+      setSavedWorkflowName(workflowName)
     }
+
+    markAsSaved()
     
     setIsSaving(false)
-  }, [workflowId, workflowName, initialWorkflowName, nodes, edges, validate, saveWorkflowGraph, updateWorkflow])
+  }, [workflowId, workflowName, savedWorkflowName, nodes, edges, validate, saveWorkflowGraph, updateWorkflow, markAsSaved])
 
   const handleRun = useCallback(async () => {
     validate()

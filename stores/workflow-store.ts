@@ -66,6 +66,7 @@ interface WorkflowState {
   
   // Versioning actions
   saveVersion: (userId: string, changelog?: string) => WorkflowVersion
+  markAsSaved: () => void
   publishVersion: () => void
   revertToVersion: (versionId: string) => void
   
@@ -221,6 +222,24 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
     return versionSnapshot
   },
 
+  markAsSaved: () => {
+    const { workflowId, nodes, edges, metadata, currentVersion } = get()
+    const versionSnapshot = createVersionSnapshot(
+      workflowId || `wf_${Date.now()}`,
+      Math.max(currentVersion, 1),
+      nodes,
+      edges,
+      metadata,
+      "system",
+      "saved"
+    )
+
+    set({
+      lastSavedVersion: versionSnapshot,
+      isDirty: false,
+    })
+  },
+
   publishVersion: () => {
     const { lastSavedVersion } = get()
     if (lastSavedVersion) {
@@ -269,11 +288,23 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   },
 
   loadWorkflow: (nodes, edges, metadata) => {
+    const workflowId = get().workflowId || `wf_${Date.now()}`
+    const versionSnapshot = createVersionSnapshot(
+      workflowId,
+      1,
+      nodes,
+      edges,
+      metadata || { ...defaultMetadata },
+      "system",
+      "loaded"
+    )
+
     set({
       nodes,
       edges,
       selectedNodeId: null,
       metadata: metadata || { ...defaultMetadata },
+      lastSavedVersion: versionSnapshot,
       isDirty: false,
     })
   },

@@ -5,6 +5,12 @@ import { jsonError, jsonOk } from "@/lib/api/response"
 export async function GET() {
     try {
         const workflows = await prisma.workflow.findMany({
+            include: {
+                versions: {
+                    orderBy: { versionNo: "desc" },
+                    take: 1,
+                },
+            },
             orderBy: { updatedAt: "desc" },
             take: 100,
         })

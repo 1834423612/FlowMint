@@ -30,6 +30,7 @@ export default function WorkflowsPage() {
     workflows, 
     isLoading, 
     fetchWorkflows, 
+    fetchWorkflowDetail,
     createWorkflow, 
     deleteWorkflow,
     setWorkflowStatus,
@@ -76,12 +77,21 @@ export default function WorkflowsPage() {
 
   const handleRunWorkflow = async (id: string) => {
     const workflow = workflows.find((w) => w.id === id)
-    if (!workflow || workflow.graph.nodes.length === 0) {
+    if (!workflow) {
       return
+    }
+
+    let graphToRun = workflow.graph
+    if (!graphToRun || graphToRun.nodes.length === 0) {
+      const detail = await fetchWorkflowDetail(id)
+      if (!detail || detail.graph.nodes.length === 0) {
+        return
+      }
+      graphToRun = detail.graph
     }
     
     // Start execution
-    await runWorkflow(workflow.id, workflow.graph)
+    await runWorkflow(workflow.id, graphToRun)
     
     // Update last run time
     setWorkflowStatus(id, workflow.status)
