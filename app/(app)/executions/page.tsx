@@ -40,17 +40,43 @@ export default function ExecutionsPage() {
   const t = useTranslations("executions")
   const tCommon = useTranslations("common")
   
-  const { executions, isLoading, fetchExecutions, deleteExecution, startPolling, stopPolling } = useExecutionsStore()
+  const { executions, currentExecution, isLoading, fetchExecutions, fetchExecution, deleteExecution, startPolling, stopPolling } = useExecutionsStore()
   
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [selectedExecution, setSelectedExecution] = useState<ExecutionData | null>(null)
+  const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null)
+
+  const selectedExecution = selectedExecutionId
+    ? (currentExecution?.id === selectedExecutionId
+        ? currentExecution
+        : executions.find((e) => e.id === selectedExecutionId) || null)
+    : null
 
   useEffect(() => {
     fetchExecutions()
     startPolling()
     return () => stopPolling()
   }, [fetchExecutions, startPolling, stopPolling])
+
+  useEffect(() => {
+    if (!selectedExecutionId) return
+
+    fetchExecution(selectedExecutionId)
+
+    const interval = setInterval(() => {
+      const latest = useExecutionsStore.getState().currentExecution
+      if (!latest || latest.id !== selectedExecutionId) {
+        fetchExecution(selectedExecutionId)
+        return
+      }
+
+      if (latest.status === "running" || latest.status === "queued") {
+        fetchExecution(selectedExecutionId)
+      }
+    }, 2000)
+
+    return () => clearInterval(interval)
+  }, [selectedExecutionId, fetchExecution])
 
   const filteredExecutions = executions.filter((execution) => {
     const matchesSearch = execution.workflowName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -177,7 +203,7 @@ export default function ExecutionsPage() {
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      onClick={() => setSelectedExecution(execution)}
+                      onClick={() => setSelectedExecutionId(execution.id)}
                     >
                       <Icon icon="lucide:external-link" className="h-4 w-4" />
                     </Button>
@@ -199,7 +225,7 @@ export default function ExecutionsPage() {
       </div>
 
       {/* Execution Details Dialog */}
-      <Dialog open={selectedExecution !== null} onOpenChange={(open) => !open && setSelectedExecution(null)}>
+      <Dialog open={selectedExecution !== null} onOpenChange={(open) => !open && setSelectedExecutionId(null)}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -279,6 +305,37 @@ export default function ExecutionsPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Screenshots */}
+              {selectedExecution.assets.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Screenshots</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    {selectedExecution.assets.map((asset) => (
+                      <a
+                        key={asset.id}
+                        href={asset.publicUrl || "#"}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-md border border-border overflow-hidden bg-muted/30"
+                      >
+                        {asset.publicUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={asset.publicUrl}
+                            alt={asset.objectKey}
+                            className="h-32 w-full object-cover"
+                          />
+                        ) : (
+                          <div className="h-32 flex items-center justify-center text-xs text-muted-foreground px-2 text-center">
+                            无公开地址，Key: {asset.objectKey}
+                          </div>
+                        )}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Error Message */}
               {selectedExecution.errorMessage && (

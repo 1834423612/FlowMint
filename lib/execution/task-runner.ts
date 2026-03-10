@@ -139,6 +139,10 @@ export async function enqueueAndRunWorkflow(input: RunWorkflowInput) {
                 onStepLog: async (message) => {
                     console.log(`[run:${run.id.toString()}] ${message}`)
                     logs.push(message)
+                    await prisma.workflowRun.update({
+                        where: { id: run.id },
+                        data: { logs },
+                    })
                 },
                 onNodeEvent: async (event) => {
                     const now = new Date()

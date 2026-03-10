@@ -23,6 +23,14 @@ export interface ExecutionLog {
   nodeId?: string
 }
 
+export interface ExecutionAsset {
+  id: string
+  type: string
+  objectKey: string
+  publicUrl?: string
+  createdAt: string
+}
+
 export interface ExecutionData {
   id: string
   workflowId: string
@@ -31,6 +39,7 @@ export interface ExecutionData {
   triggerType: TriggerType
   steps: ExecutionStep[]
   logs: ExecutionLog[]
+  assets: ExecutionAsset[]
   startedAt?: string
   finishedAt?: string
   errorMessage?: string
@@ -68,6 +77,7 @@ function mapExecutionFromApi(e: Record<string, unknown>): ExecutionData {
   const workflow = e.workflow as { id?: string | number; name?: string } | null
   const steps = (e.steps as Array<Record<string, unknown>> | null) || []
   const logs = (e.logs as string[] | null) || []
+  const assets = (e.assets as Array<Record<string, unknown>> | null) || []
   
   return {
     id: String(e.id),
@@ -91,6 +101,13 @@ function mapExecutionFromApi(e: Record<string, unknown>): ExecutionData {
       timestamp: new Date(Date.now() - (logs.length - i) * 1000).toISOString(),
       level: "info" as const,
       message: String(msg),
+    })),
+    assets: assets.map((a) => ({
+      id: String(a.id || ""),
+      type: String(a.type || "screenshot"),
+      objectKey: String(a.objectKey || ""),
+      publicUrl: a.publicUrl ? String(a.publicUrl) : undefined,
+      createdAt: String(a.createdAt || new Date().toISOString()),
     })),
     startedAt: e.startedAt ? String(e.startedAt) : undefined,
     finishedAt: e.finishedAt ? String(e.finishedAt) : undefined,

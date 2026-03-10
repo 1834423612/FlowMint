@@ -109,7 +109,7 @@ export function NodeInspector({ node }: NodeInspectorProps) {
             </div>
           )}
 
-          {(node.data.type === "click" || node.data.type === "type" || node.data.type === "wait_for") && (
+          {(node.data.type === "click" || node.data.type === "type" || node.data.type === "wait_for" || node.data.type === "extract_text" || node.data.type === "extract_data") && (
             <div className="space-y-2">
               <Label htmlFor="node-selector">{t("selector")}</Label>
               <Input
@@ -119,6 +119,22 @@ export function NodeInspector({ node }: NodeInspectorProps) {
                 onChange={(e) =>
                   updateNodeData(node.id, {
                     config: { ...node.data.config, selector: e.target.value },
+                  })
+                }
+              />
+            </div>
+          )}
+
+          {(node.data.type === "extract_text" || node.data.type === "extract_data") && (
+            <div className="space-y-2">
+              <Label htmlFor="node-attribute">Attribute (optional)</Label>
+              <Input
+                id="node-attribute"
+                placeholder="href / src / data-*"
+                value={(node.data.config?.attribute as string) || ""}
+                onChange={(e) =>
+                  updateNodeData(node.id, {
+                    config: { ...node.data.config, attribute: e.target.value },
                   })
                 }
               />
