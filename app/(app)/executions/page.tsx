@@ -40,7 +40,7 @@ export default function ExecutionsPage() {
   const t = useTranslations("executions")
   const tCommon = useTranslations("common")
   
-  const { executions, isLoading, fetchExecutions, cancelExecution, deleteExecution } = useExecutionsStore()
+  const { executions, isLoading, fetchExecutions, deleteExecution, startPolling, stopPolling } = useExecutionsStore()
   
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -48,18 +48,9 @@ export default function ExecutionsPage() {
 
   useEffect(() => {
     fetchExecutions()
-  }, [fetchExecutions])
-
-  // Auto-refresh running executions
-  useEffect(() => {
-    const hasRunning = executions.some((e) => e.status === "running")
-    if (hasRunning) {
-      const interval = setInterval(() => {
-        fetchExecutions()
-      }, 1000)
-      return () => clearInterval(interval)
-    }
-  }, [executions, fetchExecutions])
+    startPolling()
+    return () => stopPolling()
+  }, [fetchExecutions, startPolling, stopPolling])
 
   const filteredExecutions = executions.filter((execution) => {
     const matchesSearch = execution.workflowName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -190,16 +181,7 @@ export default function ExecutionsPage() {
                     >
                       <Icon icon="lucide:external-link" className="h-4 w-4" />
                     </Button>
-                    {execution.status === "running" && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        onClick={() => cancelExecution(execution.id)}
-                      >
-                        <Icon icon="lucide:square" className="h-4 w-4" />
-                      </Button>
-                    )}
-                    {execution.status !== "running" && (
+                    {execution.status !== "running" && execution.status !== "queued" && (
                       <Button 
                         variant="ghost" 
                         size="icon"

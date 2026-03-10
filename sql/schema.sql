@@ -4,10 +4,21 @@
 CREATE TABLE IF NOT EXISTS app_user (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
   email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NULL COMMENT 'bcrypt hashed password for local auth',
   display_name VARCHAR(120) NULL,
   locale VARCHAR(10) NOT NULL DEFAULT 'zh',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS user_session (
+  id VARCHAR(64) PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  expires_at DATETIME NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_session_user (user_id),
+  KEY idx_session_expires (expires_at),
+  CONSTRAINT fk_session_user FOREIGN KEY (user_id) REFERENCES app_user(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS workflow (

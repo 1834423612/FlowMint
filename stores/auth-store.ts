@@ -4,9 +4,8 @@ import { persist, createJSONStorage } from "zustand/middleware"
 export interface User {
   id: string
   email: string
-  displayName: string
+  displayName: string | null
   locale: string
-  createdAt: string
 }
 
 interface AuthState {
@@ -17,27 +16,10 @@ interface AuthState {
   // Actions
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
   register: (email: string, password: string, displayName: string) => Promise<{ success: boolean; error?: string }>
-  logout: () => void
+  logout: () => Promise<void>
+  checkAuth: () => Promise<void>
   updateUser: (data: Partial<User>) => void
   setLoading: (loading: boolean) => void
-}
-
-// In-memory user database for demo (will be replaced with real API)
-const DEMO_USERS_KEY = "flowmint_users"
-
-function getStoredUsers(): Record<string, { password: string; user: User }> {
-  if (typeof window === "undefined") return {}
-  try {
-    const stored = localStorage.getItem(DEMO_USERS_KEY)
-    return stored ? JSON.parse(stored) : {}
-  } catch {
-    return {}
-  }
-}
-
-function saveStoredUsers(users: Record<string, { password: string; user: User }>) {
-  if (typeof window === "undefined") return
-  localStorage.setItem(DEMO_USERS_KEY, JSON.stringify(users))
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -50,69 +32,83 @@ export const useAuthStore = create<AuthState>()(
       login: async (email, password) => {
         set({ isLoading: true })
         
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 500))
-        
-        const users = getStoredUsers()
-        const userRecord = users[email.toLowerCase()]
-        
-        if (!userRecord) {
+        try {
+          const response = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          })
+          
+          const data = await response.json()
+          
+          if (!response.ok) {
+            set({ isLoading: false })
+            const errorMap: Record<string, string> = {
+              "email-and-password-required": "请输入邮箱和密码",
+              "invalid-credentials": "邮箱或密码错误",
+              "login-failed": "登录失败，请重试",
+            }
+            return { success: false, error: errorMap[data.error] || data.error || "登录失败" }
+          }
+          
+          set({
+            user: data.data.user,
+            isAuthenticated: true,
+            isLoading: false,
+          })
+          
+          return { success: true }
+        } catch (error) {
           set({ isLoading: false })
-          return { success: false, error: "用户不存在" }
+          console.error("[auth-store] login error:", error)
+          return { success: false, error: "网络错误，请检查连接" }
         }
-        
-        if (userRecord.password !== password) {
-          set({ isLoading: false })
-          return { success: false, error: "密码错误" }
-        }
-        
-        set({
-          user: userRecord.user,
-          isAuthenticated: true,
-          isLoading: false,
-        })
-        
-        return { success: true }
       },
 
       register: async (email, password, displayName) => {
         set({ isLoading: true })
         
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 500))
-        
-        const users = getStoredUsers()
-        
-        if (users[email.toLowerCase()]) {
+        try {
+          const response = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password, displayName }),
+          })
+          
+          const data = await response.json()
+          
+          if (!response.ok) {
+            set({ isLoading: false })
+            const errorMap: Record<string, string> = {
+              "email-and-password-required": "请输入邮箱和密码",
+              "password-too-short": "密码长度至少为 6 位",
+              "email-already-exists": "该邮箱已被注册",
+              "registration-failed": "注册失败，请重试",
+            }
+            return { success: false, error: errorMap[data.error] || data.error || "注册失败" }
+          }
+          
+          set({
+            user: data.data.user,
+            isAuthenticated: true,
+            isLoading: false,
+          })
+          
+          return { success: true }
+        } catch (error) {
           set({ isLoading: false })
-          return { success: false, error: "该邮箱已被注册" }
+          console.error("[auth-store] register error:", error)
+          return { success: false, error: "网络错误，请检查连接" }
         }
-        
-        const newUser: User = {
-          id: `user_${Date.now()}`,
-          email: email.toLowerCase(),
-          displayName,
-          locale: "zh",
-          createdAt: new Date().toISOString(),
-        }
-        
-        users[email.toLowerCase()] = {
-          password,
-          user: newUser,
-        }
-        
-        saveStoredUsers(users)
-        
-        set({
-          user: newUser,
-          isAuthenticated: true,
-          isLoading: false,
-        })
-        
-        return { success: true }
       },
 
-      logout: () => {
+      logout: async () => {
+        try {
+          await fetch("/api/auth/logout", { method: "POST" })
+        } catch (error) {
+          console.error("[auth-store] logout error:", error)
+        }
+        
         set({
           user: null,
           isAuthenticated: false,
@@ -120,19 +116,43 @@ export const useAuthStore = create<AuthState>()(
         })
       },
 
+      checkAuth: async () => {
+        set({ isLoading: true })
+        
+        try {
+          const response = await fetch("/api/auth/me")
+          
+          if (!response.ok) {
+            set({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+            })
+            return
+          }
+          
+          const data = await response.json()
+          
+          set({
+            user: data.data.user,
+            isAuthenticated: true,
+            isLoading: false,
+          })
+        } catch (error) {
+          console.error("[auth-store] checkAuth error:", error)
+          set({
+            user: null,
+            isAuthenticated: false,
+            isLoading: false,
+          })
+        }
+      },
+
       updateUser: (data) => {
         const currentUser = get().user
         if (!currentUser) return
         
-        const updatedUser = { ...currentUser, ...data }
-        set({ user: updatedUser })
-        
-        // Update in storage
-        const users = getStoredUsers()
-        if (users[currentUser.email]) {
-          users[currentUser.email].user = updatedUser
-          saveStoredUsers(users)
-        }
+        set({ user: { ...currentUser, ...data } })
       },
 
       setLoading: (loading) => {
@@ -147,7 +167,10 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: state.isAuthenticated,
       }),
       onRehydrateStorage: () => (state) => {
-        if (state) {
+        // After rehydration, verify session with server
+        if (state && state.isAuthenticated) {
+          state.checkAuth()
+        } else if (state) {
           state.setLoading(false)
         }
       },

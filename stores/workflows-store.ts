@@ -1,6 +1,6 @@
 import { create } from "zustand"
-import { persist, createJSONStorage } from "zustand/middleware"
 import type { Node, Edge } from "@xyflow/react"
+import { useAuthStore } from "./auth-store"
 
 export type WorkflowStatus = "draft" | "active" | "paused" | "archived"
 
@@ -34,184 +34,303 @@ export interface WorkflowVersion {
 
 interface WorkflowsState {
   workflows: WorkflowData[]
-  versions: WorkflowVersion[]
+  versions: Map<string, WorkflowVersion[]>
   isLoading: boolean
+  error: string | null
 
   // Actions
   fetchWorkflows: () => Promise<void>
-  createWorkflow: (data: { name: string; description?: string }) => Promise<WorkflowData>
-  updateWorkflow: (id: string, data: Partial<WorkflowData>) => void
-  deleteWorkflow: (id: string) => void
+  createWorkflow: (data: { name: string; description?: string }) => Promise<WorkflowData | null>
+  updateWorkflow: (id: string, data: Partial<{ name: string; status: WorkflowStatus }>) => Promise<void>
+  deleteWorkflow: (id: string) => Promise<void>
   getWorkflow: (id: string) => WorkflowData | undefined
+  fetchWorkflowDetail: (id: string) => Promise<WorkflowData | null>
   
   // Graph operations
   saveWorkflowGraph: (id: string, graph: WorkflowGraph, changelog?: string) => Promise<void>
-  getWorkflowGraph: (id: string) => WorkflowGraph | undefined
   
   // Status operations
-  setWorkflowStatus: (id: string, status: WorkflowStatus) => void
+  setWorkflowStatus: (id: string, status: WorkflowStatus) => Promise<void>
   
   // Version operations
   getVersions: (workflowId: string) => WorkflowVersion[]
-  revertToVersion: (workflowId: string, versionNo: number) => void
+  
+  // Run workflow
+  runWorkflow: (id: string, graph?: WorkflowGraph) => Promise<{ runId: string } | null>
 }
 
 function generateSlug(name: string): string {
   return `${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-${Date.now()}`
 }
 
-export const useWorkflowsStore = create<WorkflowsState>()(
-  persist(
-    (set, get) => ({
-      workflows: [],
-      versions: [],
-      isLoading: false,
+function parseGraph(raw: unknown): WorkflowGraph {
+  if (!raw || typeof raw !== "object") {
+    return { nodes: [], edges: [] }
+  }
+  const g = raw as { nodes?: unknown[]; edges?: unknown[] }
+  return {
+    nodes: (g.nodes || []) as Node[],
+    edges: (g.edges || []) as Edge[],
+  }
+}
 
-      fetchWorkflows: async () => {
-        set({ isLoading: true })
-        await new Promise((resolve) => setTimeout(resolve, 300))
-        set({ isLoading: false })
-      },
+function mapWorkflowFromApi(w: Record<string, unknown>): WorkflowData {
+  const versions = w.versions as Array<{ graph?: unknown }> | undefined
+  const latestGraph = versions?.[0]?.graph ? parseGraph(versions[0].graph) : { nodes: [], edges: [] }
+  
+  return {
+    id: String(w.id),
+    name: String(w.name || ""),
+    slug: String(w.slug || ""),
+    status: (w.status as WorkflowStatus) || "draft",
+    nodeCount: latestGraph.nodes.length,
+    graph: latestGraph,
+    latestVersionNo: Number(w.latestVersionNo) || 1,
+    createdAt: String(w.createdAt || new Date().toISOString()),
+    updatedAt: String(w.updatedAt || new Date().toISOString()),
+  }
+}
 
-      createWorkflow: async (data) => {
-        const newWorkflow: WorkflowData = {
-          id: `wf_${Date.now()}`,
+export const useWorkflowsStore = create<WorkflowsState>()((set, get) => ({
+  workflows: [],
+  versions: new Map(),
+  isLoading: false,
+  error: null,
+
+  fetchWorkflows: async () => {
+    set({ isLoading: true, error: null })
+
+    try {
+      const response = await fetch("/api/workflows")
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch workflows")
+      }
+
+      const data = await response.json()
+      const workflows = (data.data || []).map(mapWorkflowFromApi)
+
+      set({ workflows, isLoading: false })
+    } catch (error) {
+      console.error("[workflows-store] fetchWorkflows error:", error)
+      set({ 
+        error: error instanceof Error ? error.message : "Failed to fetch workflows",
+        isLoading: false 
+      })
+    }
+  },
+
+  createWorkflow: async (data) => {
+    const user = useAuthStore.getState().user
+    if (!user) return null
+
+    try {
+      const slug = generateSlug(data.name)
+      const response = await fetch("/api/workflows", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ownerUserId: user.id,
           name: data.name,
-          description: data.description,
-          slug: generateSlug(data.name),
-          status: "draft",
-          nodeCount: 0,
+          slug,
           graph: { nodes: [], edges: [] },
-          latestVersionNo: 1,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }
+        }),
+      })
 
-        // Create initial version
-        const initialVersion: WorkflowVersion = {
-          id: `ver_${Date.now()}`,
-          workflowId: newWorkflow.id,
-          versionNo: 1,
-          graph: { nodes: [], edges: [] },
-          changelog: "初始版本",
-          createdAt: new Date().toISOString(),
-        }
+      if (!response.ok) {
+        throw new Error("Failed to create workflow")
+      }
 
-        set((state) => ({
-          workflows: [newWorkflow, ...state.workflows],
-          versions: [...state.versions, initialVersion],
-        }))
+      const result = await response.json()
+      const newWorkflow = mapWorkflowFromApi(result.data)
 
-        return newWorkflow
-      },
+      set((state) => ({
+        workflows: [newWorkflow, ...state.workflows],
+      }))
 
-      updateWorkflow: (id, data) => {
-        set((state) => ({
-          workflows: state.workflows.map((w) =>
-            w.id === id
-              ? {
-                  ...w,
-                  ...data,
-                  updatedAt: new Date().toISOString(),
-                }
-              : w
-          ),
-        }))
-      },
+      return newWorkflow
+    } catch (error) {
+      console.error("[workflows-store] createWorkflow error:", error)
+      return null
+    }
+  },
 
-      deleteWorkflow: (id) => {
-        set((state) => ({
-          workflows: state.workflows.filter((w) => w.id !== id),
-          versions: state.versions.filter((v) => v.workflowId !== id),
-        }))
-      },
+  updateWorkflow: async (id, data) => {
+    try {
+      const response = await fetch(`/api/workflows/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
 
-      getWorkflow: (id) => {
-        return get().workflows.find((w) => w.id === id)
-      },
+      if (!response.ok) {
+        throw new Error("Failed to update workflow")
+      }
 
-      saveWorkflowGraph: async (id, graph, changelog) => {
-        const workflow = get().workflows.find((w) => w.id === id)
-        if (!workflow) return
+      const result = await response.json()
+      const updated = mapWorkflowFromApi(result.data)
 
-        const newVersionNo = workflow.latestVersionNo + 1
-        const newVersion: WorkflowVersion = {
-          id: `ver_${Date.now()}`,
-          workflowId: id,
-          versionNo: newVersionNo,
+      set((state) => ({
+        workflows: state.workflows.map((w) => (w.id === id ? { ...w, ...updated } : w)),
+      }))
+    } catch (error) {
+      console.error("[workflows-store] updateWorkflow error:", error)
+    }
+  },
+
+  deleteWorkflow: async (id) => {
+    try {
+      const response = await fetch(`/api/workflows/${id}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to delete workflow")
+      }
+
+      set((state) => ({
+        workflows: state.workflows.filter((w) => w.id !== id),
+      }))
+    } catch (error) {
+      console.error("[workflows-store] deleteWorkflow error:", error)
+    }
+  },
+
+  getWorkflow: (id) => {
+    return get().workflows.find((w) => w.id === id)
+  },
+
+  fetchWorkflowDetail: async (id) => {
+    try {
+      const response = await fetch(`/api/workflows/${id}`)
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch workflow")
+      }
+
+      const data = await response.json()
+      const workflow = mapWorkflowFromApi(data.data)
+
+      // Update in store
+      set((state) => ({
+        workflows: state.workflows.some((w) => w.id === id)
+          ? state.workflows.map((w) => (w.id === id ? workflow : w))
+          : [...state.workflows, workflow],
+      }))
+
+      return workflow
+    } catch (error) {
+      console.error("[workflows-store] fetchWorkflowDetail error:", error)
+      return null
+    }
+  },
+
+  saveWorkflowGraph: async (id, graph, changelog) => {
+    const user = useAuthStore.getState().user
+
+    try {
+      const response = await fetch(`/api/workflows/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           graph,
           changelog,
-          createdAt: new Date().toISOString(),
-        }
+          createdBy: user?.id,
+        }),
+      })
 
-        set((state) => ({
-          workflows: state.workflows.map((w) =>
-            w.id === id
-              ? {
-                  ...w,
-                  graph,
-                  nodeCount: graph.nodes.length,
-                  latestVersionNo: newVersionNo,
-                  updatedAt: new Date().toISOString(),
-                }
-              : w
-          ),
-          versions: [...state.versions, newVersion],
-        }))
-      },
+      if (!response.ok) {
+        throw new Error("Failed to save workflow")
+      }
 
-      getWorkflowGraph: (id) => {
-        const workflow = get().workflows.find((w) => w.id === id)
-        return workflow?.graph
-      },
+      const result = await response.json()
+      const updated = mapWorkflowFromApi(result.data)
 
-      setWorkflowStatus: (id, status) => {
-        set((state) => ({
-          workflows: state.workflows.map((w) =>
-            w.id === id
-              ? {
-                  ...w,
-                  status,
-                  updatedAt: new Date().toISOString(),
-                }
-              : w
-          ),
-        }))
-      },
-
-      getVersions: (workflowId) => {
-        return get().versions
-          .filter((v) => v.workflowId === workflowId)
-          .sort((a, b) => b.versionNo - a.versionNo)
-      },
-
-      revertToVersion: (workflowId, versionNo) => {
-        const version = get().versions.find(
-          (v) => v.workflowId === workflowId && v.versionNo === versionNo
-        )
-        if (!version) return
-
-        set((state) => ({
-          workflows: state.workflows.map((w) =>
-            w.id === workflowId
-              ? {
-                  ...w,
-                  graph: JSON.parse(JSON.stringify(version.graph)),
-                  nodeCount: version.graph.nodes.length,
-                  updatedAt: new Date().toISOString(),
-                }
-              : w
-          ),
-        }))
-      },
-    }),
-    {
-      name: "flowmint-workflows",
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        workflows: state.workflows,
-        versions: state.versions,
-      }),
+      set((state) => ({
+        workflows: state.workflows.map((w) =>
+          w.id === id
+            ? {
+                ...w,
+                ...updated,
+                graph,
+                nodeCount: graph.nodes.length,
+              }
+            : w
+        ),
+      }))
+    } catch (error) {
+      console.error("[workflows-store] saveWorkflowGraph error:", error)
+      throw error
     }
-  )
-)
+  },
+
+  setWorkflowStatus: async (id, status) => {
+    try {
+      const response = await fetch(`/api/workflows/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to update workflow status")
+      }
+
+      set((state) => ({
+        workflows: state.workflows.map((w) =>
+          w.id === id ? { ...w, status, updatedAt: new Date().toISOString() } : w
+        ),
+      }))
+    } catch (error) {
+      console.error("[workflows-store] setWorkflowStatus error:", error)
+    }
+  },
+
+  getVersions: (workflowId) => {
+    return get().versions.get(workflowId) || []
+  },
+
+  runWorkflow: async (id, graph) => {
+    const user = useAuthStore.getState().user
+
+    try {
+      const body: Record<string, unknown> = {
+        triggerType: "manual",
+        engine: "playwright",
+      }
+      
+      if (user) {
+        body.createdBy = user.id
+      }
+      
+      if (graph) {
+        body.graph = graph
+      }
+
+      const response = await fetch(`/api/workflows/${id}/run`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to run workflow")
+      }
+
+      const result = await response.json()
+      const runId = String(result.data?.id || "")
+
+      // Update last run time
+      set((state) => ({
+        workflows: state.workflows.map((w) =>
+          w.id === id ? { ...w, lastRunAt: new Date().toISOString() } : w
+        ),
+      }))
+
+      return { runId }
+    } catch (error) {
+      console.error("[workflows-store] runWorkflow error:", error)
+      return null
+    }
+  },
+}))

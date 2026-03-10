@@ -74,3 +74,25 @@
 - [x] Migrate dashboard to show real statistics
 - [x] Update header with user info and logout functionality
 - [x] Add auth-related i18n translations (zh/en)
+
+## Real Database and Execution Engine Integration (Session 10)
+
+- [x] Add password_hash field to app_user table in SQL schema
+- [x] Add user_session table for session management
+- [x] Update Prisma schema with UserSession model and passwordHash field
+- [x] Create /api/auth/register endpoint with scrypt password hashing
+- [x] Create /api/auth/login endpoint with session cookie
+- [x] Create /api/auth/logout endpoint
+- [x] Create /api/auth/me endpoint for session verification
+- [x] Create lib/auth/utils.ts with hashPassword, verifyPassword, generateSessionId
+- [x] Update auth-store.ts to call real auth APIs
+- [x] Create /api/providers/[id] endpoint (GET/PUT/DELETE)
+- [x] Create /api/providers/[id]/test endpoint for connection testing
+- [x] Add test() method to OpenAICompatibleProvider
+- [x] Update providers-store.ts to call real APIs
+- [x] Update workflows-store.ts to call real APIs
+- [x] Add runWorkflow method using /api/workflows/[id]/run
+- [x] Update executions-store.ts to call real APIs with polling
+- [x] Add DELETE method to /api/executions/[id]
+- [x] Update workflow-canvas-wrapper.tsx to use runWorkflow
+- [x] Update executions page with polling for running executions

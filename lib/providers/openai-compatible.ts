@@ -9,6 +9,31 @@ export class OpenAICompatibleProvider implements AIProviderClient {
         this.creds = creds
     }
 
+    async test(): Promise<{ success: boolean; models?: string[] }> {
+        const baseUrl = (this.creds.baseUrl || "https://api.openai.com/v1").replace(/\/$/, "")
+
+        try {
+            const response = await fetch(`${baseUrl}/models`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${this.creds.apiKey}`,
+                },
+            })
+
+            if (!response.ok) {
+                const text = await response.text()
+                throw new Error(`API returned ${response.status}: ${text.slice(0, 200)}`)
+            }
+
+            const data = (await response.json()) as { data?: Array<{ id: string }> }
+            const models = data.data?.map((m) => m.id).slice(0, 10) || []
+
+            return { success: true, models }
+        } catch (error) {
+            throw error
+        }
+    }
+
     async plan(input: PlanInput): Promise<PlanOutput> {
         const model = this.creds.model || "gpt-4o-mini"
         const baseUrl = (this.creds.baseUrl || "https://api.openai.com/v1").replace(/\/$/, "")

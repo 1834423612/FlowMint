@@ -19,6 +19,64 @@
 
 ## Entries
 
+## 2026-03-10 Session 10
+- Agent: v0 (Claude Opus 4.6)
+- Scope: 将系统从模拟数据/执行改为真实数据库和真实执行引擎
+- Completed:
+  - 完善 SQL schema 和 Prisma schema
+    - 添加 `password_hash` 字段到 `app_user` 表支持本地认证
+    - 添加 `user_session` 表支持会话管理
+    - 更新 Prisma schema 同步新字段和关联
+  - 创建完整的用户认证 API
+    - `/api/auth/register` - 用户注册（密码使用 scrypt 哈希）
+    - `/api/auth/login` - 用户登录
+    - `/api/auth/logout` - 用户登出
+    - `/api/auth/me` - 验证当前会话
+    - 创建 `lib/auth/utils.ts` 提供密码哈希和会话 ID 生成
+  - 更新所有前端 stores 调用真实 API
+    - `auth-store.ts` - 调用真实认证 API，服务端会话验证
+    - `providers-store.ts` - 调用 `/api/providers` 真实 CRUD API
+    - `workflows-store.ts` - 调用 `/api/workflows` 真实 CRUD 和运行 API
+    - `executions-store.ts` - 调用 `/api/executions` 真实数据，支持轮询刷新
+  - 扩展 API 路由
+    - `/api/providers/[id]/route.ts` - Provider 详情、更新、删除
+    - `/api/providers/[id]/test/route.ts` - 测试 Provider 连接
+    - `/api/executions/[id]/route.ts` - 添加删除执行记录功能
+  - 更新 OpenAI compatible provider
+    - 添加 `test()` 方法用于验证 API 连接
+  - 更新前端组件适配新 API
+    - `workflow-canvas-wrapper.tsx` - 使用 `runWorkflow` 调用真实执行
+    - `executions/page.tsx` - 使用轮询机制刷新运行状态
+- Files created:
+  - app/api/auth/register/route.ts
+  - app/api/auth/login/route.ts
+  - app/api/auth/logout/route.ts
+  - app/api/auth/me/route.ts
+  - app/api/providers/[id]/route.ts
+  - app/api/providers/[id]/test/route.ts
+  - lib/auth/utils.ts
+- Files modified:
+  - sql/schema.sql（添加 password_hash 和 user_session 表）
+  - prisma/schema.prisma（添加 UserSession 模型和 passwordHash 字段）
+  - stores/auth-store.ts（改为调用真实 API）
+  - stores/providers-store.ts（改为调用真实 API）
+  - stores/workflows-store.ts（改为调用真实 API）
+  - stores/executions-store.ts（改为调用真实 API，添加轮询）
+  - lib/providers/openai-compatible.ts（添加 test 方法）
+  - app/api/executions/[id]/route.ts（添加 DELETE）
+  - components/editor/workflow-canvas-wrapper.tsx（使用 runWorkflow）
+  - app/(app)/executions/page.tsx（适配新 API）
+- Risks / blockers:
+  - 需要配置 DATABASE_URL 环境变量连接 MySQL 8.4
+  - 首次使用需运行 `npx prisma db push` 或执行 sql/schema.sql
+  - Playwright 执行需要服务端环境支持浏览器
+- Recommended next step:
+  - 在 Vercel 或本地配置 DATABASE_URL 环境变量
+  - 运行数据库迁移确保表结构同步
+  - 测试完整的认证和工作流执行流程
+- Checklist updated: Yes
+- Review needed: Yes（重大架构变更，从模拟改为真实数据库和执行引擎）
+
 ## 2026-03-09 Session 9
 - Agent: v0 (Claude Opus 4.6)
 - Scope: 前端页面全面功能化改造（从 UI 模板转为真实可操作系统）
@@ -340,7 +398,7 @@
   - 构建 ReactFlow 工作流编辑器（节点库面板、画布、属性检查器）
   - 实现节点类型注册表（6 类 29 种节点类型）
   - 构建执行历史页面（执行记录列表、状态筛选）
-  - 构建设置页面（语言、主题、通知、安全设置）
+  - 构建设置页面（语言、主题、通���、安全设置）
   - 使用 Zustand 实现工作流状态管理
   - 配置 Iconify 图标系统
 - Files created:

@@ -30,3 +30,14 @@ export async function GET(_: NextRequest, { params }: Params) {
         return jsonError("failed-to-fetch-execution", 500)
     }
 }
+
+export async function DELETE(_: NextRequest, { params }: Params) {
+    try {
+        const { id } = await params
+        await prisma.workflowRun.delete({ where: { id: BigInt(id) } })
+        return NextResponse.json({ ok: true })
+    } catch (error) {
+        console.error("[api/executions/:id][DELETE]", error)
+        return jsonError("failed-to-delete-execution", 500)
+    }
+}

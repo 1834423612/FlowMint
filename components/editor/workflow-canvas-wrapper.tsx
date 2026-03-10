@@ -17,7 +17,6 @@ import "@xyflow/react/dist/style.css"
 
 import { useWorkflowStore, type WorkflowNode } from "@/stores/workflow-store"
 import { useWorkflowsStore } from "@/stores/workflows-store"
-import { useExecutionsStore } from "@/stores/executions-store"
 import { CustomNode } from "./custom-node"
 import { NodeLibrary } from "./node-library"
 import { NodeInspector } from "./node-inspector"
@@ -50,8 +49,7 @@ export function WorkflowCanvasWrapper({
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
   const { screenToFlowPosition, zoomIn, zoomOut, fitView } = useReactFlow()
   
-  const { saveWorkflowGraph, updateWorkflow } = useWorkflowsStore()
-  const { startExecution } = useExecutionsStore()
+  const { saveWorkflowGraph, updateWorkflow, runWorkflow } = useWorkflowsStore()
   
   const [workflowName, setWorkflowName] = useState(initialWorkflowName)
   const [isSaving, setIsSaving] = useState(false)
@@ -171,7 +169,7 @@ export function WorkflowCanvasWrapper({
   }, [workflowId, workflowName, initialWorkflowName, nodes, edges, validate, saveWorkflowGraph, updateWorkflow])
 
   const handleRun = useCallback(async () => {
-    const validationResult = validate()
+    validate()
     
     if (nodes.length === 0) {
       alert(t("hasErrors"))
@@ -180,22 +178,20 @@ export function WorkflowCanvasWrapper({
     
     setIsRunning(true)
     
-    // Save first
-    await saveWorkflowGraph(workflowId, { nodes, edges }, "运行前自动保存")
-    
-    // Start execution
-    await startExecution(
-      workflowId,
-      workflowName,
-      { nodes, edges },
-      "manual"
-    )
-    
-    setIsRunning(false)
-    
-    // Navigate to executions page
-    router.push("/executions")
-  }, [workflowId, workflowName, nodes, edges, validate, saveWorkflowGraph, startExecution, router, t])
+    try {
+      // Run workflow with current graph (API will auto-save as new version)
+      const result = await runWorkflow(workflowId, { nodes, edges })
+      
+      if (result) {
+        // Navigate to executions page
+        router.push("/executions")
+      }
+    } catch (error) {
+      console.error("Failed to run workflow:", error)
+    } finally {
+      setIsRunning(false)
+    }
+  }, [workflowId, nodes, edges, validate, runWorkflow, router, t])
 
   return (
     <div className="flex h-screen flex-col">
