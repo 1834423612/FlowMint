@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { Icon } from "@iconify/react"
@@ -21,7 +20,6 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useWorkflowsStore } from "@/stores/workflows-store"
-import { useExecutionsStore } from "@/stores/executions-store"
 
 export default function WorkflowsPage() {
   const t = useTranslations("workflows")
@@ -34,10 +32,9 @@ export default function WorkflowsPage() {
     fetchWorkflows, 
     createWorkflow, 
     deleteWorkflow,
-    setWorkflowStatus 
+    setWorkflowStatus,
+    runWorkflow,
   } = useWorkflowsStore()
-  
-  const { startExecution } = useExecutionsStore()
   
   const [searchQuery, setSearchQuery] = useState("")
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
@@ -62,6 +59,12 @@ export default function WorkflowsPage() {
       name: newWorkflowName,
       description: newWorkflowDescription || undefined,
     })
+
+    if (!workflow) {
+      setIsCreating(false)
+      return
+    }
+
     setIsCreating(false)
     setIsCreateDialogOpen(false)
     setNewWorkflowName("")
@@ -78,12 +81,7 @@ export default function WorkflowsPage() {
     }
     
     // Start execution
-    await startExecution(
-      workflow.id,
-      workflow.name,
-      workflow.graph,
-      "manual"
-    )
+    await runWorkflow(workflow.id, workflow.graph)
     
     // Update last run time
     setWorkflowStatus(id, workflow.status)

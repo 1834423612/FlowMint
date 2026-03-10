@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/db/prisma"
 import { jsonError, jsonOk } from "@/lib/api/response"
+import { getSessionUser } from "@/lib/auth/session"
 
 interface Params {
     params: Promise<{ id: string }>
@@ -8,6 +9,11 @@ interface Params {
 
 export async function GET(_: NextRequest, { params }: Params) {
     try {
+        const user = await getSessionUser(_)
+        if (!user) {
+            return jsonError("not-authenticated", 401)
+        }
+
         const { id } = await params
         const provider = await prisma.providerAccount.findUnique({
             where: { id: BigInt(id) },
@@ -15,6 +21,10 @@ export async function GET(_: NextRequest, { params }: Params) {
 
         if (!provider) {
             return jsonError("provider-not-found", 404)
+        }
+
+        if (provider.userId !== user.id) {
+            return jsonError("forbidden", 403)
         }
 
         return jsonOk(provider)
@@ -26,6 +36,11 @@ export async function GET(_: NextRequest, { params }: Params) {
 
 export async function PUT(request: NextRequest, { params }: Params) {
     try {
+        const user = await getSessionUser(request)
+        if (!user) {
+            return jsonError("not-authenticated", 401)
+        }
+
         const { id } = await params
         const body = (await request.json()) as {
             name?: string
@@ -40,6 +55,10 @@ export async function PUT(request: NextRequest, { params }: Params) {
         const current = await prisma.providerAccount.findUnique({ where: { id: BigInt(id) } })
         if (!current) {
             return jsonError("provider-not-found", 404)
+        }
+
+        if (current.userId !== user.id) {
+            return jsonError("forbidden", 403)
         }
 
         // If setting as default, unset other defaults for the same user
@@ -72,6 +91,11 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
 export async function DELETE(_: NextRequest, { params }: Params) {
     try {
+        const user = await getSessionUser(_)
+        if (!user) {
+            return jsonError("not-authenticated", 401)
+        }
+
         const { id } = await params
         
         const provider = await prisma.providerAccount.findUnique({
@@ -80,6 +104,10 @@ export async function DELETE(_: NextRequest, { params }: Params) {
         
         if (!provider) {
             return jsonError("provider-not-found", 404)
+        }
+
+        if (provider.userId !== user.id) {
+            return jsonError("forbidden", 403)
         }
         
         await prisma.providerAccount.delete({ where: { id: BigInt(id) } })

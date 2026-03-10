@@ -34,7 +34,7 @@ export function Header({ title }: HeaderProps) {
     router.push("/login")
   }
 
-  const getInitials = (name?: string) => {
+  const getInitials = (name?: string | null) => {
     if (!name) return "U"
     const parts = name.split(" ")
     if (parts.length > 1) {

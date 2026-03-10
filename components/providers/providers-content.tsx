@@ -30,7 +30,7 @@ import { useProvidersStore, type ProviderType } from "@/stores/providers-store"
 const PROVIDER_ICONS: Record<ProviderType, string> = {
   openai: "simple-icons:openai",
   anthropic: "simple-icons:anthropic",
-  google: "simple-icons:google",
+  openrouter: "simple-icons:openrouter",
   azure: "simple-icons:microsoftazure",
   deepseek: "lucide:brain",
   ollama: "lucide:server",
@@ -40,7 +40,7 @@ const PROVIDER_ICONS: Record<ProviderType, string> = {
 const PROVIDER_MODELS: Record<ProviderType, string[]> = {
   openai: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"],
   anthropic: ["claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022", "claude-3-opus-20240229"],
-  google: ["gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"],
+  openrouter: ["openai/gpt-4o", "anthropic/claude-3.5-sonnet", "google/gemini-2.0-flash"],
   azure: ["gpt-4o", "gpt-4", "gpt-35-turbo"],
   deepseek: ["deepseek-chat", "deepseek-coder"],
   ollama: ["llama3.2", "mistral", "codellama", "phi3"],
@@ -70,7 +70,7 @@ export function ProvidersContent() {
   const [testResult, setTestResult] = useState<{ id: string; success: boolean; error?: string } | null>(null)
   const [deletingProviderId, setDeletingProviderId] = useState<string | null>(null)
 
-  const providerTypes: ProviderType[] = ["openai", "anthropic", "google", "azure", "deepseek", "ollama", "custom"]
+  const providerTypes: ProviderType[] = ["openai", "anthropic", "openrouter", "azure", "deepseek", "ollama", "custom"]
 
   useEffect(() => {
     fetchProviders()

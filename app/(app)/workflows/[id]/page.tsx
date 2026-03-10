@@ -34,6 +34,12 @@ export default function WorkflowEditorPage({ params }: WorkflowEditorPageProps) 
         const newWorkflow = await createWorkflow({
           name: t("newWorkflowName"),
         })
+
+        if (!newWorkflow) {
+          router.push("/workflows")
+          return
+        }
+
         setWorkflowData({
           id: newWorkflow.id,
           name: newWorkflow.name,

@@ -83,6 +83,8 @@ export const useAuthStore = create<AuthState>()(
               "email-and-password-required": "请输入邮箱和密码",
               "password-too-short": "密码长度至少为 6 位",
               "email-already-exists": "该邮箱已被注册",
+              "database-not-configured": "服务端数据库未配置，请联系管理员",
+              "database-schema-not-ready": "数据库表尚未初始化，请先完成迁移",
               "registration-failed": "注册失败，请重试",
             }
             return { success: false, error: errorMap[data.error] || data.error || "注册失败" }

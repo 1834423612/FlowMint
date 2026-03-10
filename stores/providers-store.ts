@@ -71,7 +71,7 @@ export const useProvidersStore = create<ProvidersState>()((set, get) => ({
     set({ isLoading: true, error: null })
 
     try {
-      const response = await fetch(`/api/providers?userId=${user.id}`)
+      const response = await fetch("/api/providers")
       
       if (!response.ok) {
         throw new Error("Failed to fetch providers")
@@ -99,7 +99,6 @@ export const useProvidersStore = create<ProvidersState>()((set, get) => ({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: user.id,
           name: data.name,
           type: data.type,
           apiKey: data.apiKey,

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server"
 import { prisma } from "@/lib/db/prisma"
 import { jsonError, jsonOk } from "@/lib/api/response"
 import { OpenAICompatibleProvider } from "@/lib/providers/openai-compatible"
+import { getSessionUser } from "@/lib/auth/session"
 
 interface Params {
     params: Promise<{ id: string }>
@@ -9,6 +10,11 @@ interface Params {
 
 export async function POST(_: NextRequest, { params }: Params) {
     try {
+        const user = await getSessionUser(_)
+        if (!user) {
+            return jsonError("not-authenticated", 401)
+        }
+
         const { id } = await params
         const provider = await prisma.providerAccount.findUnique({
             where: { id: BigInt(id) },
@@ -16,6 +22,10 @@ export async function POST(_: NextRequest, { params }: Params) {
 
         if (!provider) {
             return jsonError("provider-not-found", 404)
+        }
+
+        if (provider.userId !== user.id) {
+            return jsonError("forbidden", 403)
         }
 
         // Create a provider client and test connection

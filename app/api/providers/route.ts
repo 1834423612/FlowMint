@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/db/prisma"
 import { jsonError, jsonOk } from "@/lib/api/response"
+import { getSessionUser } from "@/lib/auth/session"
 
 export async function GET(request: NextRequest) {
     try {
-        const userId = request.nextUrl.searchParams.get("userId")
-        if (!userId) {
-            return jsonError("userId-required", 400)
+        const user = await getSessionUser(request)
+        if (!user) {
+            return jsonError("not-authenticated", 401)
         }
 
         const providers = await prisma.providerAccount.findMany({
-            where: { userId: BigInt(userId) },
+            where: { userId: user.id },
             orderBy: { updatedAt: "desc" },
         })
 
@@ -23,8 +24,12 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
     try {
+        const user = await getSessionUser(request)
+        if (!user) {
+            return jsonError("not-authenticated", 401)
+        }
+
         const body = (await request.json()) as {
-            userId: string
             name: string
             type: "openai" | "anthropic" | "openrouter" | "azure" | "deepseek" | "ollama" | "custom"
             protocol?: "openai_compatible" | "anthropic_compatible"
@@ -34,13 +39,13 @@ export async function POST(request: NextRequest) {
             isDefault?: boolean
         }
 
-        if (!body.userId || !body.name || !body.type || !body.apiKey) {
-            return jsonError("userId-name-type-apiKey-required", 400)
+        if (!body.name || !body.type || !body.apiKey) {
+            return jsonError("name-type-apiKey-required", 400)
         }
 
         const provider = await prisma.providerAccount.create({
             data: {
-                userId: BigInt(body.userId),
+                userId: user.id,
                 name: body.name,
                 type: body.type,
                 protocol: body.protocol || "openai_compatible",

@@ -44,12 +44,13 @@ enum AssetType {
 }
 
 model User {
-  id          BigInt   @id @default(autoincrement())
-  email       String   @unique @db.VarChar(255)
-  displayName String?  @map("display_name") @db.VarChar(120)
-  locale      String   @default("zh") @db.VarChar(10)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  id           BigInt   @id @default(autoincrement())
+  email        String   @unique @db.VarChar(255)
+  passwordHash String?  @map("password_hash") @db.VarChar(255)
+  displayName  String?  @map("display_name") @db.VarChar(120)
+  locale       String   @default("zh") @db.VarChar(10)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   authIdentities      AuthIdentity[]
   providerAccounts    ProviderAccount[]
@@ -57,8 +58,22 @@ model User {
   workflowRuns        WorkflowRun[]        @relation("UserWorkflowRuns")
   environmentProfiles EnvironmentProfile[]
   reviewNotes         ReviewNote[]
+  sessions            UserSession[]
 
   @@map("app_user")
+}
+
+model UserSession {
+  id        String   @id @db.VarChar(64)
+  userId    BigInt   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("user_session")
 }
 
 model AuthIdentity {

@@ -74,6 +74,17 @@ export async function POST(request: NextRequest) {
         return response
     } catch (error) {
         console.error("[api/auth/register][POST]", error)
+
+        if (error instanceof Error) {
+            const message = error.message
+            if (message.includes("Environment variable not found: DATABASE_URL")) {
+                return jsonError("database-not-configured", 500)
+            }
+            if (message.includes("The table") && message.includes("does not exist")) {
+                return jsonError("database-schema-not-ready", 500)
+            }
+        }
+
         return jsonError("registration-failed", 500)
     }
 }
