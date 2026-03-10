@@ -1,0 +1,318 @@
+{
+  "common": {
+    "appName": "FlowMint",
+    "loading": "加载中...",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "search": "搜索",
+    "filter": "筛选",
+    "export": "导出",
+    "import": "导入",
+    "run": "运行",
+    "stop": "停止",
+    "retry": "重试",
+    "confirm": "确认",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "close": "关闭",
+    "actions": "操作",
+    "status": "状态",
+    "name": "名称",
+    "description": "描述",
+    "createdAt": "创建时间",
+    "updatedAt": "更新时间",
+    "noData": "暂无数据",
+    "settings": "设置"
+  },
+  "nav": {
+    "dashboard": "仪表盘",
+    "workflows": "工作流",
+    "executions": "执行历史",
+    "providers": "AI 提供商",
+    "settings": "设置",
+    "help": "帮助",
+    "logout": "退出登录"
+  },
+  "dashboard": {
+    "title": "仪表盘",
+    "welcome": "欢迎回来",
+    "overview": "概览",
+    "totalWorkflows": "工作流总数",
+    "activeWorkflows": "活跃工作流",
+    "totalExecutions": "执行总数",
+    "successRate": "成功率",
+    "recentExecutions": "最近执行",
+    "quickActions": "快捷操作",
+    "createWorkflow": "创建工作流",
+    "viewAll": "查看全部",
+    "noRecentExecutions": "暂无最近执行记录"
+  },
+  "workflows": {
+    "title": "工作流",
+    "subtitle": "管理您的自动化工作流",
+    "create": "新建工作流",
+    "import": "导入工作流",
+    "search": "搜索工作流...",
+    "empty": "暂无工作流",
+    "emptyDescription": "创建您的第一个工作流，开始自动化浏览器任务",
+    "status": {
+      "draft": "草稿",
+      "active": "活跃",
+      "paused": "已暂停",
+      "archived": "已归档"
+    },
+    "actions": {
+      "edit": "编辑",
+      "duplicate": "复制",
+      "export": "导出",
+      "delete": "删除",
+      "run": "运行"
+    },
+    "deleteConfirm": {
+      "title": "删除工作流",
+      "description": "确定要删除此工作流吗？此操作无法撤销。"
+    },
+    "nodeCountUnit": "个节点"
+  },
+  "editor": {
+    "title": "工作流编辑器",
+    "newWorkflowName": "新建工作流",
+    "workflowNamePrefix": "工作流",
+    "save": "保存",
+    "run": "运行",
+    "undo": "撤销",
+    "redo": "重做",
+    "zoomIn": "放大",
+    "zoomOut": "缩小",
+    "fitView": "适应视图",
+    "nodeLibrary": "节点库",
+    "inspector": "属性检查器",
+    "minimap": "小地图",
+    "unsaved": "未保存",
+    "hasErrors": "工作流存在错误",
+    "hasWarnings": "工作流存在警告",
+    "categories": {
+      "trigger": "触发器",
+      "browser": "浏览器",
+      "page": "页面操作",
+      "data": "数据处理",
+      "flow": "流程控制",
+      "ai": "AI 能力"
+    },
+    "nodes": {
+      "trigger": {
+        "manual": "手动触发",
+        "schedule": "定时触发",
+        "webhook": "Webhook"
+      },
+      "browser": {
+        "openBrowser": "打开浏览器",
+        "closeBrowser": "关闭浏览器",
+        "newTab": "新建标签页",
+        "closeTab": "关闭标签页",
+        "navigate": "导航到 URL"
+      },
+      "page": {
+        "click": "点击元素",
+        "type": "输入文本",
+        "scroll": "滚动页面",
+        "screenshot": "截图",
+        "waitFor": "等待元素",
+        "extractText": "提取文本",
+        "extractData": "提取数据"
+      },
+      "data": {
+        "setVariable": "设置变量",
+        "transform": "数据转换",
+        "filter": "数据筛选",
+        "aggregate": "数据聚合",
+        "httpRequest": "HTTP 请求"
+      },
+      "flow": {
+        "condition": "条件分支",
+        "loop": "循环",
+        "delay": "延迟",
+        "parallel": "并行执行",
+        "subWorkflow": "子工作流"
+      },
+      "ai": {
+        "llmChat": "AI 对话",
+        "textClassify": "文本分类",
+        "entityExtract": "实体提取",
+        "sentiment": "情感分析"
+      }
+    },
+    "inspector": {
+      "noSelection": "选择一个节点来查看和编辑其属性",
+      "nodeId": "节点 ID",
+      "nodeType": "节点类型",
+      "properties": "属性",
+      "label": "标签",
+      "url": "URL",
+      "urlPlaceholder": "https://example.com",
+      "selector": "CSS 选择器",
+      "selectorPlaceholder": "#element, .class, [data-id]",
+      "textToType": "输入文本",
+      "textPlaceholder": "请输入文本...",
+      "delayMs": "延迟（毫秒）",
+      "delayPlaceholder": "1000",
+      "prompt": "提示词",
+      "promptPlaceholder": "请输入提示词...",
+      "deleteNode": "删除节点",
+      "deleteConfirm": {
+        "title": "删除节点",
+        "description": "确定要删除该节点吗？相关连线也会一起删除。"
+      }
+    }
+  },
+  "executions": {
+    "title": "执行历史",
+    "subtitle": "查看工作流执行记录",
+    "search": "搜索执行记录...",
+    "empty": "暂无执行记录",
+    "emptyDescription": "运行工作流后，执行记录将显示在这里",
+    "status": {
+      "pending": "等待中",
+      "running": "运行中",
+      "success": "成功",
+      "failed": "失败",
+      "cancelled": "已取消"
+    },
+    "columns": {
+      "workflow": "工作流",
+      "status": "状态",
+      "startedAt": "开始时间",
+      "duration": "耗时",
+      "trigger": "触发方式"
+    },
+    "details": {
+      "title": "执行详情",
+      "logs": "执行日志",
+      "result": "执行结果",
+      "error": "错误信息"
+    },
+    "filters": {
+      "statusPlaceholder": "状态",
+      "allStatuses": "全部状态"
+    },
+    "triggers": {
+      "manual": "手动",
+      "schedule": "定时",
+      "webhook": "Webhook"
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "general": "通用设置",
+    "appearance": "外观",
+    "language": "语言",
+    "theme": "主题",
+    "notifications": "通知",
+    "account": "账户",
+    "security": "安全",
+    "apiKeys": "API 密钥",
+    "integrations": "集成",
+    "descriptions": {
+      "language": "选择您偏好的界面语言",
+      "apiKeys": "管理用于外部集成的 API 密钥",
+      "theme": "自定义应用外观",
+      "notifications": "配置您接收通知的方式",
+      "security": "管理您的账户安全设置"
+    },
+    "apiKeyCards": {
+      "production": {
+        "title": "生产环境 API 密钥",
+        "masked": "fm_prod_**********************",
+        "copy": "复制"
+      },
+      "generateNew": "生成新密钥"
+    },
+    "notificationItems": {
+      "workflowCompletion": {
+        "title": "工作流完成",
+        "description": "当工作流执行完成时通知我"
+      },
+      "workflowFailures": {
+        "title": "工作流失败",
+        "description": "当工作流执行失败时通知我"
+      },
+      "emailNotifications": {
+        "title": "邮件通知",
+        "description": "通过电子邮件接收通知"
+      }
+    },
+    "securityItems": {
+      "password": {
+        "title": "密码",
+        "lastChanged": "上次修改于 30 天前",
+        "change": "修改"
+      },
+      "twoFactor": {
+        "title": "双因素认证",
+        "description": "为账户增加额外安全保护",
+        "enable": "启用"
+      }
+    },
+    "themes": {
+      "light": "浅色",
+      "dark": "深色",
+      "system": "跟随系统"
+    }
+  },
+  "user": {
+    "profile": "个人资料",
+    "preferences": "偏好设置",
+    "logout": "退出登录",
+    "notifications": "通知",
+    "accountMenu": "我的账户"
+  },
+  "providers": {
+    "title": "AI 提供商",
+    "subtitle": "管理您的 AI 模型提供商配置",
+    "addProvider": "添加提供商",
+    "configured": "已配置",
+    "notConfigured": "未配置",
+    "default": "默认",
+    "setAsDefault": "设为默认",
+    "testConnection": "测试连接",
+    "testing": "测试中...",
+    "connectionSuccess": "连接成功",
+    "connectionFailed": "连接失败",
+    "apiKey": "API 密钥",
+    "providerType": "提供商类型",
+    "apiKeyPlaceholder": "输入您的 API 密钥",
+    "baseUrl": "Base URL",
+    "baseUrlPlaceholder": "可选，自定义 API 端点",
+    "models": "可用模型",
+    "selectModel": "选择模型",
+    "defaultModel": "默认模型",
+    "providerTypes": {
+      "openai": "OpenAI",
+      "anthropic": "Anthropic",
+      "google": "Google AI",
+      "azure": "Azure OpenAI",
+      "deepseek": "DeepSeek",
+      "ollama": "Ollama",
+      "custom": "自定义"
+    },
+    "providerDescriptions": {
+      "openai": "GPT-4o、GPT-4、GPT-3.5 系列模型",
+      "anthropic": "Claude 3.5、Claude 3 系列模型",
+      "google": "Gemini Pro、Gemini Flash 系列模型",
+      "azure": "Azure 托管的 OpenAI 模型",
+      "deepseek": "DeepSeek V3、DeepSeek Coder 模型",
+      "ollama": "本地运行的开源模型",
+      "custom": "自定义 OpenAI 兼容 API"
+    },
+    "empty": "暂无配置的提供商",
+    "emptyDescription": "添加 AI 提供商以启用智能工作流功能",
+    "deleteConfirm": {
+      "title": "删除提供商",
+      "description": "确定要删除此提供商配置吗？相关的工作流可能会受到影响。"
+    }
+  }
+}

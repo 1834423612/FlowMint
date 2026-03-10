@@ -4,53 +4,56 @@
 
 ## Foundation
 
-- [ ] Confirm docs directory structure is present and readable
-- [ ] Initialize Next.js + TypeScript + Tailwind + shadcn/ui
-- [ ] Add Iconify and icon conventions
-- [ ] Add i18n foundation with `zh` and `en`
-- [ ] Create app shell layout and navigation
-- [ ] Create design tokens and UI primitives
+- [x] Confirm docs directory structure is present and readable
+- [x] Initialize Next.js + TypeScript + Tailwind + shadcn/ui
+- [x] Add Iconify and icon conventions
+- [x] Add i18n foundation with `zh` and `en`
+- [x] Create app shell layout and navigation
+- [x] Create design tokens and UI primitives
 
 ## Core product pages
 
-- [ ] Dashboard skeleton
-- [ ] Workflows list page
-- [ ] Workflow editor shell
-- [ ] Execution history page
-- [ ] Provider settings page
-- [ ] Account and auth settings page
+- [x] Dashboard skeleton
+- [x] Workflows list page
+- [x] Workflow editor shell
+- [x] Execution history page
+- [x] Provider settings page
+- [x] Account and auth settings page
 
 ## Workflow system
 
-- [ ] Define workflow JSON schema
-- [ ] Define node type registry
-- [ ] Build ReactFlow-based editor skeleton
-- [ ] Build node config side panel
-- [ ] Build edge and validation behavior
-- [ ] Add workflow versioning strategy
+- [x] Define workflow JSON schema
+- [x] Define node type registry
+- [x] Build ReactFlow-based editor skeleton
+- [x] Build node config side panel
+- [x] Build edge and validation behavior
+- [x] Add workflow versioning strategy
 
 ## Execution engine
 
-- [ ] Define runtime contracts
-- [ ] Add Playwright integration layer
-- [ ] Add Stagehand integration layer
-- [ ] Add AI planning service interface
-- [ ] Add execution logs and screenshots flow
-- [ ] Add error handling and retry policy
+- [x] Define runtime contracts
+- [x] Add Playwright integration layer
+- [x] Add Stagehand integration layer
+- [x] Add AI planning service interface
+- [x] Add execution logs and screenshots flow
+- [x] Add error handling and retry policy
+- [x] Support running current editor graph immediately via API
 
 ## Data layer
 
-- [ ] Draft Prisma schema framework
-- [ ] Define SQL delivery rules
-- [ ] Create merged `/sql/schema.sql`
-- [ ] Create merged `/sql/seed.sql`
-- [ ] Add initial example data rows
+- [x] Draft Prisma schema framework
+- [x] Define SQL delivery rules
+- [x] Create merged `/sql/schema.sql`
+- [x] Create merged `/sql/seed.sql`
+- [x] Add initial example data rows
 
 ## Quality and governance
 
-- [ ] Start `agent-log.md`
-- [ ] Start `review-board.md`
-- [ ] Start `decision-log.md`
-- [ ] Run first architecture review
-- [ ] Run first UI consistency review
-- [ ] Run first i18n review
+- [x] Start `agent-log.md`
+- [x] Start `review-board.md`
+- [x] Start `decision-log.md`
+- [x] Complete first known-error self-correction pass (build + i18n + editor runtime)
+- [x] Run first architecture review
+- [x] Run first UI consistency review
+- [x] Run first i18n review
+- [x] Unify destructive-action confirmation and remove key hardcoded UI copy
