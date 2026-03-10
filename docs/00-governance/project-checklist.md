@@ -57,3 +57,20 @@
 - [x] Run first UI consistency review
 - [x] Run first i18n review
 - [x] Unify destructive-action confirmation and remove key hardcoded UI copy
+
+## Frontend Functionalization (Session 9)
+
+- [x] Implement user authentication system (login/register/session)
+- [x] Create auth-store with Zustand + localStorage persistence
+- [x] Create AuthGuard component for protected routes
+- [x] Migrate providers page from mock data to real store
+- [x] Migrate workflows list page from mock data to real store
+- [x] Implement workflow creation dialog
+- [x] Complete workflow editor with load/save/run functionality
+- [x] Create workflow-canvas-wrapper with full integration
+- [x] Implement execution simulation engine
+- [x] Migrate executions page to use real execution data
+- [x] Add execution details dialog with steps and logs
+- [x] Migrate dashboard to show real statistics
+- [x] Update header with user info and logout functionality
+- [x] Add auth-related i18n translations (zh/en)

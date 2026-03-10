@@ -1,10 +1,12 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { Icon } from "@iconify/react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { Input } from "@/components/ui/input"
 import {
   Tooltip,
   TooltipContent,
@@ -13,6 +15,7 @@ import {
 
 interface EditorToolbarProps {
   workflowName: string
+  onWorkflowNameChange?: (name: string) => void
   isDirty?: boolean
   hasErrors?: boolean
   hasWarnings?: boolean
@@ -22,10 +25,13 @@ interface EditorToolbarProps {
   onZoomIn: () => void
   onZoomOut: () => void
   onFitView: () => void
+  isSaving?: boolean
+  isRunning?: boolean
 }
 
 export function EditorToolbar({
   workflowName,
+  onWorkflowNameChange,
   isDirty = false,
   hasErrors = false,
   hasWarnings = false,
@@ -35,9 +41,29 @@ export function EditorToolbar({
   onZoomIn,
   onZoomOut,
   onFitView,
+  isSaving = false,
+  isRunning = false,
 }: EditorToolbarProps) {
   const t = useTranslations("editor")
   const tCommon = useTranslations("common")
+  const [isEditing, setIsEditing] = useState(false)
+  const [editName, setEditName] = useState(workflowName)
+
+  const handleNameSubmit = () => {
+    if (editName.trim() && onWorkflowNameChange) {
+      onWorkflowNameChange(editName.trim())
+    }
+    setIsEditing(false)
+  }
+
+  const handleNameKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleNameSubmit()
+    } else if (e.key === "Escape") {
+      setEditName(workflowName)
+      setIsEditing(false)
+    }
+  }
 
   return (
     <div className="flex h-12 items-center justify-between border-b border-border bg-card px-4">
@@ -58,7 +84,28 @@ export function EditorToolbar({
 
         <div className="flex items-center gap-2">
           <Icon icon="lucide:workflow" className="h-4 w-4 text-primary" />
-          <span className="font-medium">{workflowName}</span>
+          {isEditing && onWorkflowNameChange ? (
+            <Input
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              onBlur={handleNameSubmit}
+              onKeyDown={handleNameKeyDown}
+              className="h-7 w-48 text-sm"
+              autoFocus
+            />
+          ) : (
+            <button
+              onClick={() => {
+                if (onWorkflowNameChange) {
+                  setEditName(workflowName)
+                  setIsEditing(true)
+                }
+              }}
+              className="font-medium hover:text-primary transition-colors"
+            >
+              {workflowName}
+            </button>
+          )}
           {version > 0 && (
             <span className="text-xs text-muted-foreground">v{version}</span>
           )}
@@ -117,13 +164,30 @@ export function EditorToolbar({
 
         <Separator orientation="vertical" className="mx-2 h-6" />
 
-        <Button variant={isDirty ? "default" : "outline"} size="sm" onClick={onSave}>
-          <Icon icon="lucide:save" className="mr-2 h-4 w-4" />
+        <Button 
+          variant={isDirty ? "default" : "outline"} 
+          size="sm" 
+          onClick={onSave}
+          disabled={isSaving}
+        >
+          {isSaving ? (
+            <Icon icon="lucide:loader-2" className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Icon icon="lucide:save" className="mr-2 h-4 w-4" />
+          )}
           {t("save")}
         </Button>
 
-        <Button size="sm" onClick={onRun} disabled={hasErrors}>
-          <Icon icon="lucide:play" className="mr-2 h-4 w-4" />
+        <Button 
+          size="sm" 
+          onClick={onRun} 
+          disabled={hasErrors || isRunning}
+        >
+          {isRunning ? (
+            <Icon icon="lucide:loader-2" className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Icon icon="lucide:play" className="mr-2 h-4 w-4" />
+          )}
           {t("run")}
         </Button>
       </div>

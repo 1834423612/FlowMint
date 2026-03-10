@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useTranslations } from "next-intl"
 import { Icon } from "@iconify/react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -25,19 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { EmptyState } from "@/components/ui/empty-state"
-
-type ProviderType = "openai" | "anthropic" | "google" | "azure" | "deepseek" | "ollama" | "custom"
-
-interface ProviderConfig {
-  id: string
-  type: ProviderType
-  name: string
-  isConfigured: boolean
-  isDefault: boolean
-  apiKeyMasked?: string
-  baseUrl?: string
-  defaultModel?: string
-}
+import { useProvidersStore, type ProviderType } from "@/stores/providers-store"
 
 const PROVIDER_ICONS: Record<ProviderType, string> = {
   openai: "simple-icons:openai",
@@ -59,54 +47,43 @@ const PROVIDER_MODELS: Record<ProviderType, string[]> = {
   custom: [],
 }
 
-// Mock data - will be replaced with real API data
-const mockProviders: ProviderConfig[] = [
-  {
-    id: "1",
-    type: "openai",
-    name: "OpenAI",
-    isConfigured: true,
-    isDefault: true,
-    apiKeyMasked: "sk-****************************abcd",
-    defaultModel: "gpt-4o",
-  },
-  {
-    id: "2",
-    type: "anthropic",
-    name: "Anthropic",
-    isConfigured: true,
-    isDefault: false,
-    apiKeyMasked: "sk-ant-****************************wxyz",
-    defaultModel: "claude-3-5-sonnet-20241022",
-  },
-]
-
 export function ProvidersContent() {
   const t = useTranslations("providers")
   const tCommon = useTranslations("common")
-  const [providers, setProviders] = useState<ProviderConfig[]>(mockProviders)
+  
+  const { 
+    providers, 
+    isLoading, 
+    fetchProviders, 
+    addProvider, 
+    deleteProvider, 
+    setDefault, 
+    testConnection 
+  } = useProvidersStore()
+  
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [selectedType, setSelectedType] = useState<ProviderType>("openai")
   const [apiKey, setApiKey] = useState("")
   const [baseUrl, setBaseUrl] = useState("")
   const [selectedModel, setSelectedModel] = useState("")
   const [testingConnection, setTestingConnection] = useState<string | null>(null)
+  const [testResult, setTestResult] = useState<{ id: string; success: boolean; error?: string } | null>(null)
   const [deletingProviderId, setDeletingProviderId] = useState<string | null>(null)
 
   const providerTypes: ProviderType[] = ["openai", "anthropic", "google", "azure", "deepseek", "ollama", "custom"]
 
-  const handleAddProvider = () => {
-    const newProvider: ProviderConfig = {
-      id: Date.now().toString(),
+  useEffect(() => {
+    fetchProviders()
+  }, [fetchProviders])
+
+  const handleAddProvider = async () => {
+    await addProvider({
       type: selectedType,
       name: t(`providerTypes.${selectedType}`),
-      isConfigured: true,
-      isDefault: providers.length === 0,
-      apiKeyMasked: apiKey ? `${apiKey.slice(0, 6)}****${apiKey.slice(-4)}` : undefined,
+      apiKey,
       baseUrl: baseUrl || undefined,
       defaultModel: selectedModel || PROVIDER_MODELS[selectedType][0],
-    }
-    setProviders([...providers, newProvider])
+    })
     setIsAddDialogOpen(false)
     setApiKey("")
     setBaseUrl("")
@@ -114,23 +91,30 @@ export function ProvidersContent() {
   }
 
   const handleSetDefault = (id: string) => {
-    setProviders(providers.map(p => ({
-      ...p,
-      isDefault: p.id === id,
-    })))
+    setDefault(id)
   }
 
   const handleDelete = (id: string) => {
-    setProviders(providers.filter(p => p.id !== id))
+    deleteProvider(id)
+    setDeletingProviderId(null)
+  }
+
+  const handleTestConnection = async (id: string) => {
+    setTestingConnection(id)
+    setTestResult(null)
+    const result = await testConnection(id)
+    setTestResult({ id, ...result })
+    setTestingConnection(null)
   }
 
   const deletingProvider = providers.find((provider) => provider.id === deletingProviderId) ?? null
 
-  const handleTestConnection = async (id: string) => {
-    setTestingConnection(id)
-    // Simulate API test
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    setTestingConnection(null)
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Icon icon="lucide:loader-2" className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
   }
 
   return (
@@ -280,6 +264,15 @@ export function ProvidersContent() {
                     <p className="font-mono text-sm">{provider.baseUrl}</p>
                   </div>
                 )}
+                {testResult && testResult.id === provider.id && (
+                  <div className={`rounded-md p-3 text-sm ${testResult.success ? "bg-green-500/10 text-green-600" : "bg-destructive/10 text-destructive"}`}>
+                    <Icon 
+                      icon={testResult.success ? "lucide:check-circle" : "lucide:alert-circle"} 
+                      className="mr-2 inline h-4 w-4" 
+                    />
+                    {testResult.success ? t("connectionSuccess") : `${t("connectionFailed")}: ${testResult.error}`}
+                  </div>
+                )}
                 <div className="flex flex-wrap gap-2 pt-2">
                   <Button
                     variant="outline"
@@ -343,7 +336,6 @@ export function ProvidersContent() {
                 if (deletingProvider) {
                   handleDelete(deletingProvider.id)
                 }
-                setDeletingProviderId(null)
               }}
             >
               {tCommon("delete")}

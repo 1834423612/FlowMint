@@ -1,4 +1,35 @@
 {
+  "auth": {
+    "email": "邮箱",
+    "emailPlaceholder": "请输入邮箱地址",
+    "password": "密码",
+    "passwordPlaceholder": "请输入密码",
+    "confirmPassword": "确认密码",
+    "confirmPasswordPlaceholder": "请再次输入密码",
+    "displayName": "显示名称",
+    "displayNamePlaceholder": "请输入您的名称",
+    "login": {
+      "title": "登录",
+      "subtitle": "登录您的 FlowMint 账户",
+      "submit": "登录",
+      "noAccount": "还没有账户？",
+      "register": "立即注册"
+    },
+    "register": {
+      "title": "注册",
+      "subtitle": "创建您的 FlowMint 账户",
+      "submit": "注册",
+      "hasAccount": "已有账户？",
+      "login": "立即登录"
+    },
+    "errors": {
+      "required": "请填写所有必填字段",
+      "loginFailed": "登录失败，请重试",
+      "registerFailed": "注册失败，请重试",
+      "passwordMismatch": "两次输入的密码不一致",
+      "passwordTooShort": "密码长度至少为 6 位"
+    }
+  },
   "common": {
     "appName": "FlowMint",
     "loading": "加载中...",

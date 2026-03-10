@@ -1,4 +1,35 @@
 {
+  "auth": {
+    "email": "Email",
+    "emailPlaceholder": "Enter your email address",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Re-enter your password",
+    "displayName": "Display Name",
+    "displayNamePlaceholder": "Enter your name",
+    "login": {
+      "title": "Sign In",
+      "subtitle": "Sign in to your FlowMint account",
+      "submit": "Sign In",
+      "noAccount": "Don't have an account?",
+      "register": "Sign Up"
+    },
+    "register": {
+      "title": "Sign Up",
+      "subtitle": "Create your FlowMint account",
+      "submit": "Sign Up",
+      "hasAccount": "Already have an account?",
+      "login": "Sign In"
+    },
+    "errors": {
+      "required": "Please fill in all required fields",
+      "loginFailed": "Login failed, please try again",
+      "registerFailed": "Registration failed, please try again",
+      "passwordMismatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 6 characters"
+    }
+  },
   "common": {
     "appName": "FlowMint",
     "loading": "Loading...",

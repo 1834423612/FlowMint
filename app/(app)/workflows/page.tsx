@@ -1,82 +1,112 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import { getTranslations } from "next-intl/server"
+import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Icon } from "@iconify/react"
 import { Header } from "@/components/layout/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { WorkflowCard, type Workflow } from "@/components/workflows/workflow-card"
+import { WorkflowCard } from "@/components/workflows/workflow-card"
 import { EmptyState } from "@/components/ui/empty-state"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { useWorkflowsStore } from "@/stores/workflows-store"
+import { useExecutionsStore } from "@/stores/executions-store"
 
-export async function generateMetadata() {
-  const t = await getTranslations("workflows")
-  return {
-    title: t("title"),
+export default function WorkflowsPage() {
+  const t = useTranslations("workflows")
+  const tCommon = useTranslations("common")
+  const router = useRouter()
+  
+  const { 
+    workflows, 
+    isLoading, 
+    fetchWorkflows, 
+    createWorkflow, 
+    deleteWorkflow,
+    setWorkflowStatus 
+  } = useWorkflowsStore()
+  
+  const { startExecution } = useExecutionsStore()
+  
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [newWorkflowName, setNewWorkflowName] = useState("")
+  const [newWorkflowDescription, setNewWorkflowDescription] = useState("")
+  const [isCreating, setIsCreating] = useState(false)
+
+  useEffect(() => {
+    fetchWorkflows()
+  }, [fetchWorkflows])
+
+  const filteredWorkflows = workflows.filter((workflow) =>
+    workflow.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    workflow.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const handleCreateWorkflow = async () => {
+    if (!newWorkflowName.trim()) return
+    
+    setIsCreating(true)
+    const workflow = await createWorkflow({
+      name: newWorkflowName,
+      description: newWorkflowDescription || undefined,
+    })
+    setIsCreating(false)
+    setIsCreateDialogOpen(false)
+    setNewWorkflowName("")
+    setNewWorkflowDescription("")
+    
+    // Navigate to the new workflow editor
+    router.push(`/workflows/${workflow.id}`)
   }
-}
 
-const mockWorkflows: Workflow[] = [
-  {
-    id: "1",
-    name: "电商数据抓取",
-    description: "自动抓取电商平台的产品信息、价格和评论数据",
-    status: "active",
-    lastRun: "2 分钟前",
-    nodeCount: 12,
-    createdAt: "2024-01-15",
-    updatedAt: "2024-01-20",
-  },
-  {
-    id: "2",
-    name: "社交媒体监控",
-    description: "监控社交媒体上的品牌提及和用户反馈",
-    status: "active",
-    lastRun: "5 分钟前",
-    nodeCount: 8,
-    createdAt: "2024-01-10",
-    updatedAt: "2024-01-18",
-  },
-  {
-    id: "3",
-    name: "竞品价格监控",
-    description: "定期检查竞争对手的产品定价变化",
-    status: "paused",
-    lastRun: "1 小时前",
-    nodeCount: 6,
-    createdAt: "2024-01-08",
-    updatedAt: "2024-01-15",
-  },
-  {
-    id: "4",
-    name: "新闻聚合",
-    description: "从多个新闻源收集和整理行业相关新闻",
-    status: "active",
-    nodeCount: 10,
-    createdAt: "2024-01-05",
-    updatedAt: "2024-01-12",
-  },
-  {
-    id: "5",
-    name: "表单自动填写",
-    description: "自动填写重复性的在线表单和申请",
-    status: "draft",
-    nodeCount: 4,
-    createdAt: "2024-01-02",
-    updatedAt: "2024-01-05",
-  },
-  {
-    id: "6",
-    name: "数据备份流程",
-    description: "定期从 Web 应用导出和备份关键数据",
-    status: "archived",
-    lastRun: "3 天前",
-    nodeCount: 7,
-    createdAt: "2023-12-20",
-    updatedAt: "2024-01-01",
-  },
-]
+  const handleRunWorkflow = async (id: string) => {
+    const workflow = workflows.find((w) => w.id === id)
+    if (!workflow || workflow.graph.nodes.length === 0) {
+      return
+    }
+    
+    // Start execution
+    await startExecution(
+      workflow.id,
+      workflow.name,
+      workflow.graph,
+      "manual"
+    )
+    
+    // Update last run time
+    setWorkflowStatus(id, workflow.status)
+    
+    // Navigate to executions page
+    router.push("/executions")
+  }
 
-export default async function WorkflowsPage() {
-  const t = await getTranslations("workflows")
+  const handleDeleteWorkflow = (id: string) => {
+    deleteWorkflow(id)
+  }
+
+  // Convert WorkflowData to the format expected by WorkflowCard
+  const workflowsForCard = filteredWorkflows.map((w) => ({
+    id: w.id,
+    name: w.name,
+    description: w.description,
+    status: w.status,
+    nodeCount: w.nodeCount,
+    createdAt: w.createdAt,
+    updatedAt: w.updatedAt,
+    lastRun: w.lastRunAt ? formatRelativeTime(w.lastRunAt) : undefined,
+  }))
 
   return (
     <div className="flex flex-col">
@@ -93,11 +123,9 @@ export default async function WorkflowsPage() {
               <Icon icon="lucide:upload" className="mr-2 h-4 w-4" />
               {t("import")}
             </Button>
-            <Button asChild>
-              <Link href="/workflows/new">
-                <Icon icon="lucide:plus" className="mr-2 h-4 w-4" />
-                {t("create")}
-              </Link>
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
+              <Icon icon="lucide:plus" className="mr-2 h-4 w-4" />
+              {t("create")}
             </Button>
           </div>
         </div>
@@ -112,31 +140,107 @@ export default async function WorkflowsPage() {
               type="search"
               placeholder={t("search")}
               className="pl-9"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
 
-        {mockWorkflows.length === 0 ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Icon icon="lucide:loader-2" className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : workflowsForCard.length === 0 ? (
           <EmptyState
             icon="lucide:git-branch"
-            title={t("empty")}
-            description={t("emptyDescription")}
+            title={searchQuery ? tCommon("noData") : t("empty")}
+            description={searchQuery ? undefined : t("emptyDescription")}
           >
-            <Button asChild>
-              <Link href="/workflows/new">
+            {!searchQuery && (
+              <Button onClick={() => setIsCreateDialogOpen(true)}>
                 <Icon icon="lucide:plus" className="mr-2 h-4 w-4" />
                 {t("create")}
-              </Link>
-            </Button>
+              </Button>
+            )}
           </EmptyState>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {mockWorkflows.map((workflow) => (
-              <WorkflowCard key={workflow.id} workflow={workflow} />
+            {workflowsForCard.map((workflow) => (
+              <WorkflowCard 
+                key={workflow.id} 
+                workflow={workflow} 
+                onRun={handleRunWorkflow}
+                onDelete={handleDeleteWorkflow}
+              />
             ))}
           </div>
         )}
       </div>
+
+      {/* Create Workflow Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("create")}</DialogTitle>
+            <DialogDescription>
+              {t("emptyDescription")}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">{tCommon("name")}</Label>
+              <Input
+                id="name"
+                placeholder={t("search").replace("...", "")}
+                value={newWorkflowName}
+                onChange={(e) => setNewWorkflowName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="description">{tCommon("description")}</Label>
+              <Textarea
+                id="description"
+                placeholder={t("subtitle")}
+                value={newWorkflowDescription}
+                onChange={(e) => setNewWorkflowDescription(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              {tCommon("cancel")}
+            </Button>
+            <Button onClick={handleCreateWorkflow} disabled={!newWorkflowName.trim() || isCreating}>
+              {isCreating ? (
+                <>
+                  <Icon icon="lucide:loader-2" className="mr-2 h-4 w-4 animate-spin" />
+                  {tCommon("loading")}
+                </>
+              ) : (
+                <>
+                  <Icon icon="lucide:plus" className="mr-2 h-4 w-4" />
+                  {tCommon("create")}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
+}
+
+function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
+
+  if (diffMins < 1) return "刚刚"
+  if (diffMins < 60) return `${diffMins} 分钟前`
+  if (diffHours < 24) return `${diffHours} 小时前`
+  return `${diffDays} 天前`
 }
