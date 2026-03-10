@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/db/prisma"
+import { jsonError, jsonOk } from "@/lib/api/response"
 
 export async function GET() {
     try {
@@ -7,10 +8,10 @@ export async function GET() {
             orderBy: { updatedAt: "desc" },
             take: 100,
         })
-        return NextResponse.json({ data: workflows })
+        return jsonOk(workflows)
     } catch (error) {
         console.error("[api/workflows][GET]", error)
-        return NextResponse.json({ error: "failed-to-fetch-workflows" }, { status: 500 })
+        return jsonError("failed-to-fetch-workflows", 500)
     }
 }
 
@@ -21,6 +22,10 @@ export async function POST(request: NextRequest) {
             name: string
             slug: string
             graph?: unknown
+        }
+
+        if (!body.ownerUserId || !body.name || !body.slug) {
+            return jsonError("ownerUserId-name-slug-required", 400)
         }
 
         const workflow = await prisma.workflow.create({
@@ -39,9 +44,9 @@ export async function POST(request: NextRequest) {
             },
         })
 
-        return NextResponse.json({ data: workflow }, { status: 201 })
+        return jsonOk(workflow, { status: 201 })
     } catch (error) {
         console.error("[api/workflows][POST]", error)
-        return NextResponse.json({ error: "failed-to-create-workflow" }, { status: 500 })
+        return jsonError("failed-to-create-workflow", 500)
     }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/db/prisma"
+import { jsonError, jsonOk } from "@/lib/api/response"
 
 interface Params {
     params: Promise<{ id: string }>
@@ -19,13 +20,13 @@ export async function GET(_: NextRequest, { params }: Params) {
         })
 
         if (!workflow) {
-            return NextResponse.json({ error: "workflow-not-found" }, { status: 404 })
+            return jsonError("workflow-not-found", 404)
         }
 
-        return NextResponse.json({ data: workflow })
+        return jsonOk(workflow)
     } catch (error) {
         console.error("[api/workflows/:id][GET]", error)
-        return NextResponse.json({ error: "failed-to-fetch-workflow" }, { status: 500 })
+        return jsonError("failed-to-fetch-workflow", 500)
     }
 }
 
@@ -42,7 +43,7 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
         const current = await prisma.workflow.findUnique({ where: { id: BigInt(id) } })
         if (!current) {
-            return NextResponse.json({ error: "workflow-not-found" }, { status: 404 })
+            return jsonError("workflow-not-found", 404)
         }
 
         const updated = await prisma.workflow.update({
@@ -66,10 +67,10 @@ export async function PUT(request: NextRequest, { params }: Params) {
             })
         }
 
-        return NextResponse.json({ data: updated })
+        return jsonOk(updated)
     } catch (error) {
         console.error("[api/workflows/:id][PUT]", error)
-        return NextResponse.json({ error: "failed-to-update-workflow" }, { status: 500 })
+        return jsonError("failed-to-update-workflow", 500)
     }
 }
 
@@ -80,6 +81,6 @@ export async function DELETE(_: NextRequest, { params }: Params) {
         return NextResponse.json({ ok: true })
     } catch (error) {
         console.error("[api/workflows/:id][DELETE]", error)
-        return NextResponse.json({ error: "failed-to-delete-workflow" }, { status: 500 })
+        return jsonError("failed-to-delete-workflow", 500)
     }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { enqueueAndRunWorkflow } from "@/lib/execution/task-runner"
+import { jsonError, jsonOk } from "@/lib/api/response"
 
 interface Params {
     params: Promise<{ id: string }>
@@ -12,6 +13,7 @@ export async function POST(request: NextRequest, { params }: Params) {
             triggerType?: string
             engine?: "playwright" | "stagehand"
             createdBy?: string
+            graph?: unknown
         }
 
         const run = await enqueueAndRunWorkflow({
@@ -19,11 +21,12 @@ export async function POST(request: NextRequest, { params }: Params) {
             triggerType: body.triggerType,
             engine: body.engine,
             createdBy: body.createdBy,
+            graph: body.graph,
         })
 
-        return NextResponse.json({ data: run }, { status: 202 })
+        return jsonOk(run, { status: 202 })
     } catch (error) {
         console.error("[api/workflows/:id/run][POST]", error)
-        return NextResponse.json({ error: "failed-to-run-workflow" }, { status: 500 })
+        return jsonError("failed-to-run-workflow", 500)
     }
 }

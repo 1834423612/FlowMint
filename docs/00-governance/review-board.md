@@ -19,6 +19,34 @@
 
 ## Entries
 
+## Review 2026-03-09 - 工作流执行闭环增强代码审查
+
+- Reviewer: Codex (GPT-5.3-Codex)
+- Scope reviewed: runtime 事件链路、task-runner 落库、即时运行 API、响应序列化
+- Files reviewed:
+  - lib/runtime/types.ts
+  - lib/runtime/workflow-runtime.ts
+  - lib/execution/task-runner.ts
+  - lib/api/response.ts
+  - app/api/workflows/route.ts
+  - app/api/workflows/[id]/route.ts
+  - app/api/workflows/[id]/run/route.ts
+  - app/api/executions/route.ts
+  - app/api/executions/[id]/route.ts
+  - app/api/providers/route.ts
+- Findings:
+  - Severity: Medium
+  - Issue: 运行接口为请求内同步执行，长任务在无队列部署形态下存在超时风险
+  - Suggested fix: 下一迭代引入 BullMQ/worker，将 route handler 仅负责入队并立即返回 runId
+  - Severity: Low
+  - Issue: `Condition` 节点表达式采用 `new Function` 动态求值，存在表达式安全边界风险
+  - Suggested fix: 收敛为受限表达式 DSL 或引入安全表达式解析器
+  - Severity: Low
+  - Issue: provider 密钥当前仍是占位直存流程
+  - Suggested fix: 在 provider 写入路径接入 KMS/应用层加密并增加轮换策略
+- Overall result: PASS（功能闭环可用，存在可追踪的中低优先风险项）
+- Follow-up owner: 下一个 backend agent
+
 ## Review 2026-03-09 - 后端系统逻辑首轮代码复审
 
 - Reviewer: Codex (GPT-5.3-Codex)

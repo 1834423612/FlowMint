@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/db/prisma"
+import { jsonError, jsonOk } from "@/lib/api/response"
 
 export async function GET(request: NextRequest) {
     try {
         const userId = request.nextUrl.searchParams.get("userId")
         if (!userId) {
-            return NextResponse.json({ error: "userId-required" }, { status: 400 })
+            return jsonError("userId-required", 400)
         }
 
         const providers = await prisma.providerAccount.findMany({
@@ -13,10 +14,10 @@ export async function GET(request: NextRequest) {
             orderBy: { updatedAt: "desc" },
         })
 
-        return NextResponse.json({ data: providers })
+        return jsonOk(providers)
     } catch (error) {
         console.error("[api/providers][GET]", error)
-        return NextResponse.json({ error: "failed-to-fetch-providers" }, { status: 500 })
+        return jsonError("failed-to-fetch-providers", 500)
     }
 }
 
@@ -33,6 +34,10 @@ export async function POST(request: NextRequest) {
             isDefault?: boolean
         }
 
+        if (!body.userId || !body.name || !body.type || !body.apiKey) {
+            return jsonError("userId-name-type-apiKey-required", 400)
+        }
+
         const provider = await prisma.providerAccount.create({
             data: {
                 userId: BigInt(body.userId),
@@ -46,9 +51,9 @@ export async function POST(request: NextRequest) {
             },
         })
 
-        return NextResponse.json({ data: provider }, { status: 201 })
+        return jsonOk(provider, { status: 201 })
     } catch (error) {
         console.error("[api/providers][POST]", error)
-        return NextResponse.json({ error: "failed-to-create-provider" }, { status: 500 })
+        return jsonError("failed-to-create-provider", 500)
     }
 }

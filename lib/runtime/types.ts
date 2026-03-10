@@ -43,8 +43,28 @@ export interface WorkflowExecutionContext {
 
 export interface NodeExecutionResult {
     status: WorkflowRunState
+    attempts: number
     output?: unknown
     error?: string
+}
+
+export type RuntimeNodeEventType = "started" | "success" | "failed"
+
+export interface RuntimeNodeEvent {
+    event: RuntimeNodeEventType
+    nodeId: string
+    nodeType: RuntimeNodeType
+    attempt: number
+    input?: Record<string, unknown>
+    output?: unknown
+    error?: string
+}
+
+export interface RuntimeAssetEvent {
+    nodeId: string
+    nodeType: RuntimeNodeType
+    key: string
+    publicUrl?: string
 }
 
 export interface BrowserSession {

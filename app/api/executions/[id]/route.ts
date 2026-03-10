@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/db/prisma"
+import { jsonError, jsonOk } from "@/lib/api/response"
 
 interface Params {
     params: Promise<{ id: string }>
@@ -20,12 +21,12 @@ export async function GET(_: NextRequest, { params }: Params) {
         })
 
         if (!run) {
-            return NextResponse.json({ error: "execution-not-found" }, { status: 404 })
+            return jsonError("execution-not-found", 404)
         }
 
-        return NextResponse.json({ data: run })
+        return jsonOk(run)
     } catch (error) {
         console.error("[api/executions/:id][GET]", error)
-        return NextResponse.json({ error: "failed-to-fetch-execution" }, { status: 500 })
+        return jsonError("failed-to-fetch-execution", 500)
     }
 }

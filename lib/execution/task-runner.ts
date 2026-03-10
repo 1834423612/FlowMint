@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db/prisma"
+import { Prisma } from "@/generated/prisma"
 import { WorkflowRuntime } from "@/lib/runtime/workflow-runtime"
 import type { WorkflowGraph } from "@/lib/runtime/types"
 import { getDefaultAIProvider } from "@/lib/providers/factory"
@@ -23,44 +24,87 @@ function parseGraph(raw: unknown): WorkflowGraph {
     }
 }
 
+function toInputJson(value: unknown): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined {
+    if (typeof value === "undefined") {
+        return undefined
+    }
+
+    return JSON.parse(JSON.stringify(value)) as Prisma.InputJsonValue
+}
+
+function coerceEngine(engine?: string): "playwright" | "stagehand" {
+    return engine === "stagehand" ? "stagehand" : "playwright"
+}
+
 export interface RunWorkflowInput {
     workflowId: string
     triggerType?: string
     engine?: "playwright" | "stagehand"
     createdBy?: string
+    graph?: unknown
 }
 
 export async function enqueueAndRunWorkflow(input: RunWorkflowInput) {
     const workflowId = toBigInt(input.workflowId)
+    const engine = coerceEngine(input.engine)
 
     const workflow = await prisma.workflow.findUnique({ where: { id: workflowId } })
     if (!workflow) {
         throw new Error("workflow not found")
     }
 
-    const version = await prisma.workflowVersion.findFirst({
+    const latestVersion = await prisma.workflowVersion.findFirst({
         where: { workflowId },
         orderBy: { versionNo: "desc" },
     })
 
-    if (!version) {
+    if (!latestVersion && !input.graph) {
         throw new Error("workflow has no version")
     }
+
+    let versionToRun = latestVersion
+    if (input.graph) {
+        const nextVersionNo = (latestVersion?.versionNo || 0) + 1
+        versionToRun = await prisma.workflowVersion.create({
+            data: {
+                workflowId,
+                versionNo: nextVersionNo,
+                graph: toInputJson(parseGraph(input.graph)) as Prisma.InputJsonValue,
+                changelog: "auto snapshot before manual run",
+                createdBy: input.createdBy ? toBigInt(input.createdBy) : null,
+            },
+        })
+
+        await prisma.workflow.update({
+            where: { id: workflowId },
+            data: { latestVersionNo: nextVersionNo },
+        })
+    }
+
+    if (!versionToRun) {
+        throw new Error("workflow has no runnable version")
+    }
+
+    const graph = parseGraph(versionToRun.graph)
 
     const run = await prisma.workflowRun.create({
         data: {
             workflowId,
-            workflowVersionId: version.id,
+            workflowVersionId: versionToRun.id,
             triggerType: input.triggerType || "manual",
             status: "queued",
             createdBy: input.createdBy ? toBigInt(input.createdBy) : null,
             metadata: {
-                engine: input.engine || "playwright",
+                engine,
+                versionNo: versionToRun.versionNo,
+                startedBy: input.createdBy || null,
             },
         },
     })
 
     const runtime = new WorkflowRuntime()
+    const stepMap = new Map<string, bigint>()
+    const logs: string[] = []
 
     await prisma.workflowRun.update({
         where: { id: run.id },
@@ -71,7 +115,6 @@ export async function enqueueAndRunWorkflow(input: RunWorkflowInput) {
     })
 
     try {
-        const graph = parseGraph(version.graph)
         const aiProvider = workflow.ownerUserId ? await getDefaultAIProvider(workflow.ownerUserId) : null
 
         await runtime.run(
@@ -84,7 +127,7 @@ export async function enqueueAndRunWorkflow(input: RunWorkflowInput) {
                 metadata: {},
             },
             {
-                engine: input.engine || "playwright",
+                engine,
                 aiProvider: aiProvider
                     ? {
                         plan: async (prompt, data) => {
@@ -95,6 +138,83 @@ export async function enqueueAndRunWorkflow(input: RunWorkflowInput) {
                     : null,
                 onStepLog: async (message) => {
                     console.log(`[run:${run.id.toString()}] ${message}`)
+                    logs.push(message)
+                },
+                onNodeEvent: async (event) => {
+                    const now = new Date()
+                    const existingStepId = stepMap.get(event.nodeId)
+
+                    if (event.event === "started") {
+                        if (!existingStepId) {
+                            const created = await prisma.workflowRunStep.create({
+                                data: {
+                                    workflowRunId: run.id,
+                                    nodeId: event.nodeId,
+                                    nodeType: event.nodeType,
+                                    status: "running",
+                                    attempts: event.attempt,
+                                    input: toInputJson(event.input),
+                                    startedAt: now,
+                                },
+                            })
+                            stepMap.set(event.nodeId, created.id)
+                        } else {
+                            await prisma.workflowRunStep.update({
+                                where: { id: existingStepId },
+                                data: {
+                                    status: "running",
+                                    attempts: event.attempt,
+                                    input: toInputJson(event.input),
+                                    errorMessage: null,
+                                    finishedAt: null,
+                                },
+                            })
+                        }
+                        return
+                    }
+
+                    const stepId = existingStepId
+                    if (!stepId) {
+                        return
+                    }
+
+                    if (event.event === "success") {
+                        await prisma.workflowRunStep.update({
+                            where: { id: stepId },
+                            data: {
+                                status: "success",
+                                attempts: event.attempt,
+                                output: toInputJson(event.output),
+                                finishedAt: now,
+                            },
+                        })
+                        return
+                    }
+
+                    await prisma.workflowRunStep.update({
+                        where: { id: stepId },
+                        data: {
+                            status: "failed",
+                            attempts: event.attempt,
+                            errorMessage: event.error,
+                            finishedAt: now,
+                        },
+                    })
+                },
+                onAsset: async (asset) => {
+                    await prisma.asset.create({
+                        data: {
+                            workflowRunId: run.id,
+                            type: "screenshot",
+                            bucket: process.env.R2_BUCKET || "r2",
+                            objectKey: asset.key,
+                            publicUrl: asset.publicUrl,
+                            metadata: {
+                                nodeId: asset.nodeId,
+                                nodeType: asset.nodeType,
+                            },
+                        },
+                    })
                 },
             }
         )
@@ -104,6 +224,12 @@ export async function enqueueAndRunWorkflow(input: RunWorkflowInput) {
             data: {
                 status: "success",
                 finishedAt: new Date(),
+                logs,
+                metadata: {
+                    engine,
+                    versionNo: versionToRun.versionNo,
+                    stepCount: stepMap.size,
+                },
             },
         })
     } catch (error) {
@@ -114,6 +240,12 @@ export async function enqueueAndRunWorkflow(input: RunWorkflowInput) {
                 status: "failed",
                 finishedAt: new Date(),
                 errorMessage,
+                logs,
+                metadata: {
+                    engine,
+                    versionNo: versionToRun.versionNo,
+                    stepCount: stepMap.size,
+                },
             },
         })
     }

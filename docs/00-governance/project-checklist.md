@@ -37,6 +37,7 @@
 - [x] Add AI planning service interface
 - [x] Add execution logs and screenshots flow
 - [x] Add error handling and retry policy
+- [x] Support running current editor graph immediately via API
 
 ## Data layer
 

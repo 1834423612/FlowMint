@@ -19,6 +19,40 @@
 
 ## Entries
 
+## 2026-03-09 Session 8
+- Agent: Codex (GPT-5.3-Codex)
+- Scope: 工作流执行闭环增强（即时运行、步骤落库、资产记录、API序列化健壮性）
+- Completed:
+  - 扩展 runtime 事件模型，增加节点级 started/success/failed 生命周期上报
+  - 重构执行流程为可校验拓扑执行，补充无起点/未完整执行检测
+  - 在 task-runner 中实现 `workflow_run_step` 逐步持久化（状态、重试次数、输入输出、错误）
+  - 在 Screenshot 节点链路中落库 `asset` 记录（R2 objectKey/publicUrl + 节点元数据）
+  - 支持 `POST /api/workflows/[id]/run` 传入 `graph` 进行“当前画布即刻执行”，并自动创建版本快照
+  - 新增统一 API 响应序列化工具，解决 BigInt/Date JSON 返回风险
+  - 完成 `pnpm build` 全量构建通过验证
+- Files created:
+  - lib/api/response.ts
+- Files modified:
+  - lib/runtime/types.ts
+  - lib/runtime/workflow-runtime.ts
+  - lib/execution/task-runner.ts
+  - app/api/workflows/route.ts
+  - app/api/workflows/[id]/route.ts
+  - app/api/workflows/[id]/run/route.ts
+  - app/api/executions/route.ts
+  - app/api/executions/[id]/route.ts
+  - app/api/providers/route.ts
+  - docs/00-governance/project-checklist.md
+  - docs/00-governance/agent-log.md
+- Risks / blockers:
+  - `/api/workflows/[id]/run` 目前仍为单请求内执行，超长流程可能触发平台超时，建议下一步接入 queue/worker
+  - provider 密钥仍为占位存储流程，尚未接入加密/KMS
+- Recommended next step:
+  - 为执行器增加异步队列模式（BullMQ）和取消机制
+  - 增加 API 集成测试：步骤重试、失败回滚、截图资产入库
+- Checklist updated: Yes
+- Review needed: Yes
+
 ## 2026-03-09 Session 7
 - Agent: Codex (GPT-5.3-Codex)
 - Scope: 后端与系统逻辑实现（API + Prisma + Runtime + Playwright/Stagehand + Provider abstraction）
