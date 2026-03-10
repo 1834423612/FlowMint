@@ -91,6 +91,7 @@ export function ProvidersContent() {
   const [baseUrl, setBaseUrl] = useState("")
   const [selectedModel, setSelectedModel] = useState("")
   const [testingConnection, setTestingConnection] = useState<string | null>(null)
+  const [deletingProviderId, setDeletingProviderId] = useState<string | null>(null)
 
   const providerTypes: ProviderType[] = ["openai", "anthropic", "google", "azure", "deepseek", "ollama", "custom"]
 
@@ -122,6 +123,8 @@ export function ProvidersContent() {
   const handleDelete = (id: string) => {
     setProviders(providers.filter(p => p.id !== id))
   }
+
+  const deletingProvider = providers.find((provider) => provider.id === deletingProviderId) ?? null
 
   const handleTestConnection = async (id: string) => {
     setTestingConnection(id)
@@ -310,7 +313,7 @@ export function ProvidersContent() {
                     variant="ghost"
                     size="sm"
                     className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    onClick={() => handleDelete(provider.id)}
+                    onClick={() => setDeletingProviderId(provider.id)}
                   >
                     <Icon icon="lucide:trash-2" className="mr-2 h-4 w-4" />
                     {tCommon("delete")}
@@ -321,6 +324,33 @@ export function ProvidersContent() {
           ))}
         </div>
       )}
+
+      <Dialog open={deletingProviderId !== null} onOpenChange={(open) => !open && setDeletingProviderId(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("deleteConfirm.title")}</DialogTitle>
+            <DialogDescription>
+              {t("deleteConfirm.description")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeletingProviderId(null)}>
+              {tCommon("cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (deletingProvider) {
+                  handleDelete(deletingProvider.id)
+                }
+                setDeletingProviderId(null)
+              }}
+            >
+              {tCommon("delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

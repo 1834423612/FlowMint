@@ -19,6 +19,59 @@
 
 ## Entries
 
+## Review 2026-03-09 - 首次架构一致性审查
+
+- Reviewer: Codex (GPT-5.3-Codex)
+- Scope reviewed: `docs/02-architecture/architecture.md` 与当前仓库目录/模块边界一致性
+- Files reviewed:
+  - docs/02-architecture/architecture.md
+  - lib/
+  - stores/workflow-store.ts
+  - lib/workflow/validators.ts
+  - lib/workflow/versioning.ts
+  - app/(app)/workflows/page.tsx
+  - app/(app)/executions/page.tsx
+- Findings:
+  - Severity: High
+  - Issue: 目标架构中要求的 `features/workflows`、`features/executions` 尚未建立，当前业务逻辑散落在 `components/`、`stores/`、`lib/workflow/`
+  - Suggested fix: 增加 `features/workflows` 与 `features/executions` 目录并逐步迁移编排逻辑；`app/` 仅保留页面壳层
+  - Severity: High
+  - Issue: 目标架构中 `lib/providers`、`lib/runtime`、`lib/browser`、`lib/db`、`lib/storage` 均缺失
+  - Suggested fix: 先创建模块骨架与接口契约文件，避免后续实现继续漂移到无边界目录
+  - Severity: Medium
+  - Issue: `stores/workflow-store.ts` 与 `types/workflow.ts` 仍处于根目录，未按 feature 聚合
+  - Suggested fix: 将 workflow 专属 store/type 迁移到 `features/workflows/` 下并暴露 index API
+- Overall result: FAIL（存在明显结构漂移，需在下一迭代优先收敛）
+- Follow-up owner: 下一个 Agent（建议先完成 runtime contracts + feature 目录重构）
+
+## Review 2026-03-09 - 首次 UI 一致性审查
+
+- Reviewer: Codex (GPT-5.3-Codex)
+- Scope reviewed: `docs/01-product/style-guide.md` 与现有页面/UI 组件一致性
+- Files reviewed:
+  - docs/01-product/style-guide.md
+  - app/globals.css
+  - components/layout/header.tsx
+  - components/workflows/workflow-card.tsx
+  - components/editor/node-inspector.tsx
+  - components/providers/providers-content.tsx
+  - app/(app)/executions/page.tsx
+- Findings:
+  - Severity: High
+  - Issue: 破坏性操作未统一确认流程（如 provider 删除、node 删除、workflow 删除回调）
+  - Suggested fix: 统一使用 `AlertDialog/Dialog` 二次确认，并复用 `deleteConfirm` i18n 文案
+  - Severity: Medium
+  - Issue: 仍有硬编码英文 UI 文案（`Search...`、`Notifications`、`My Account`、`More actions`、`Delete Node`）
+  - Suggested fix: 全部迁移至 `messages/zh.json` 与 `messages/en.json`，禁止组件内硬编码
+  - Severity: Medium
+  - Issue: 页面容器宽度与信息密度存在不一致（providers 使用 `max-w-4xl`，其余页面多为全宽）
+  - Suggested fix: 在 layout 层定义统一内容容器策略（如标准页宽/流式页宽两种模式）
+  - Severity: Low
+  - Issue: `app/globals.css` 的 `--color-primary` 偏绿色，与 style-guide 的 indigo/blue 主色方向不一致
+  - Suggested fix: 将主色令牌调整为蓝/靛家族，保持跨页面视觉语义一致
+- Overall result: FAIL（UI 基础统一性存在缺口，需先补关键交互规范）
+- Follow-up owner: 下一个 Agent（建议优先处理删除确认与硬编码文案）
+
 ## Review 2026-03-09 - 已知报错修复与自纠错审批
 - Reviewer: Codex (GPT-5.3-Codex)
 - Scope reviewed: providers i18n、workflow editor route、ReactFlow 连接类型、validators 类型安全

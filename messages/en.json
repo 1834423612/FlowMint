@@ -75,7 +75,8 @@
     "deleteConfirm": {
       "title": "Delete Workflow",
       "description": "Are you sure you want to delete this workflow? This action cannot be undone."
-    }
+    },
+    "nodeCountUnit": "nodes"
   },
   "editor": {
     "title": "Workflow Editor",
@@ -149,7 +150,23 @@
       "noSelection": "Select a node to view and edit its properties",
       "nodeId": "Node ID",
       "nodeType": "Node Type",
-      "properties": "Properties"
+      "properties": "Properties",
+      "label": "Label",
+      "url": "URL",
+      "urlPlaceholder": "https://example.com",
+      "selector": "CSS Selector",
+      "selectorPlaceholder": "#element, .class, [data-id]",
+      "textToType": "Text to Type",
+      "textPlaceholder": "Enter text...",
+      "delayMs": "Delay (ms)",
+      "delayPlaceholder": "1000",
+      "prompt": "Prompt",
+      "promptPlaceholder": "Enter your prompt...",
+      "deleteNode": "Delete Node",
+      "deleteConfirm": {
+        "title": "Delete Node",
+        "description": "Are you sure you want to delete this node? Connected edges will also be removed."
+      }
     }
   },
   "executions": {
@@ -177,6 +194,15 @@
       "logs": "Execution Logs",
       "result": "Result",
       "error": "Error"
+    },
+    "filters": {
+      "statusPlaceholder": "Status",
+      "allStatuses": "All Statuses"
+    },
+    "triggers": {
+      "manual": "Manual",
+      "schedule": "Schedule",
+      "webhook": "Webhook"
     }
   },
   "settings": {
@@ -199,7 +225,9 @@
   "user": {
     "profile": "Profile",
     "preferences": "Preferences",
-    "logout": "Logout"
+    "logout": "Logout",
+    "notifications": "Notifications",
+    "accountMenu": "My Account"
   },
   "providers": {
     "title": "AI Providers",

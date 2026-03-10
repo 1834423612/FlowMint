@@ -19,6 +19,33 @@
 
 ## Entries
 
+## 2026-03-09 Session 5
+- Agent: Codex (GPT-5.3-Codex)
+- Scope: Vercel 构建拦截修复（Next.js CVE）+ 首次架构/UI 治理审查落地
+- Completed:
+  - 升级 `next` 从 `15.2.4` 到 `16.1.6`，消除 Vercel 漏洞版本拦截风险
+  - 执行 `pnpm build` 验证升级后构建可用（编译/类型检查/页面生成通过）
+  - 完成 first architecture review，并写入 `review-board.md`
+  - 完成 first UI consistency review，并写入 `review-board.md`
+  - 更新 `project-checklist.md` 勾选两项治理任务
+- Files created:
+  - 无
+- Files modified:
+  - package.json
+  - pnpm-lock.yaml
+  - tsconfig.json
+  - docs/00-governance/review-board.md
+  - docs/00-governance/project-checklist.md
+  - docs/00-governance/agent-log.md
+- Risks / blockers:
+  - 架构模块边界仍未收敛（`features/*` 与 `lib/*` 关键模块骨架缺失）
+  - UI 关键交互规范仍有缺口（删除确认、部分硬编码文案）
+- Recommended next step:
+  - 先创建 `features/workflows|executions` 与 `lib/providers|runtime|browser|db|storage` 模块骨架
+  - 统一接入删除确认交互并清理剩余硬编码文案
+- Checklist updated: Yes
+- Review needed: No（本次即治理审查执行）
+
 ## 2026-03-09 Session 4
 - Agent: Codex (GPT-5.3-Codex)
 - Scope: 首轮全局自纠错审批（优先修复已知控制台与构建报错）

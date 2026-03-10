@@ -22,6 +22,7 @@ export async function generateMetadata() {
 }
 
 type ExecutionStatus = "pending" | "running" | "success" | "failed" | "cancelled"
+type ExecutionTrigger = "manual" | "schedule" | "webhook"
 
 interface Execution {
   id: string
@@ -30,7 +31,7 @@ interface Execution {
   status: ExecutionStatus
   startedAt: string
   duration?: string
-  trigger: string
+  trigger: ExecutionTrigger
 }
 
 const mockExecutions: Execution[] = [
@@ -41,7 +42,7 @@ const mockExecutions: Execution[] = [
     status: "success",
     startedAt: "2024-01-20 15:30:45",
     duration: "45s",
-    trigger: "Manual",
+    trigger: "manual",
   },
   {
     id: "exec-2",
@@ -49,7 +50,7 @@ const mockExecutions: Execution[] = [
     workflowName: "社交媒体监控",
     status: "running",
     startedAt: "2024-01-20 15:28:00",
-    trigger: "Schedule",
+    trigger: "schedule",
   },
   {
     id: "exec-3",
@@ -58,7 +59,7 @@ const mockExecutions: Execution[] = [
     status: "failed",
     startedAt: "2024-01-20 15:15:30",
     duration: "12s",
-    trigger: "Schedule",
+    trigger: "schedule",
   },
   {
     id: "exec-4",
@@ -67,7 +68,7 @@ const mockExecutions: Execution[] = [
     status: "success",
     startedAt: "2024-01-20 14:30:00",
     duration: "52s",
-    trigger: "Manual",
+    trigger: "manual",
   },
   {
     id: "exec-5",
@@ -76,7 +77,7 @@ const mockExecutions: Execution[] = [
     status: "success",
     startedAt: "2024-01-20 14:00:00",
     duration: "2m 30s",
-    trigger: "Webhook",
+    trigger: "webhook",
   },
   {
     id: "exec-6",
@@ -85,7 +86,7 @@ const mockExecutions: Execution[] = [
     status: "cancelled",
     startedAt: "2024-01-20 13:45:00",
     duration: "5s",
-    trigger: "Manual",
+    trigger: "manual",
   },
 ]
 
@@ -123,10 +124,10 @@ export default async function ExecutionsPage() {
           </div>
           <Select defaultValue="all">
             <SelectTrigger className="w-40">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={t("filters.statusPlaceholder")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="all">{t("filters.allStatuses")}</SelectItem>
               <SelectItem value="success">{t("status.success")}</SelectItem>
               <SelectItem value="failed">{t("status.failed")}</SelectItem>
               <SelectItem value="running">{t("status.running")}</SelectItem>
@@ -176,7 +177,7 @@ export default async function ExecutionsPage() {
                   </div>
                   <div className="text-sm text-muted-foreground">{execution.startedAt}</div>
                   <div className="text-sm">{execution.duration || "-"}</div>
-                  <div className="text-sm text-muted-foreground">{execution.trigger}</div>
+                  <div className="text-sm text-muted-foreground">{t(`triggers.${execution.trigger}`)}</div>
                   <div>
                     <Button variant="ghost" size="icon">
                       <Icon icon="lucide:external-link" className="h-4 w-4" />

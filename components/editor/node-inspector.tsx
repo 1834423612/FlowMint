@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { Icon } from "@iconify/react"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -8,6 +9,14 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { useWorkflowStore, type WorkflowNode } from "@/stores/workflow-store"
 import { getNodeDefinition } from "@/types/workflow"
 
@@ -18,7 +27,9 @@ interface NodeInspectorProps {
 export function NodeInspector({ node }: NodeInspectorProps) {
   const t = useTranslations("editor.inspector")
   const tNodes = useTranslations("editor.nodes")
+  const tCommon = useTranslations("common")
   const { updateNodeData, deleteNode } = useWorkflowStore()
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   if (!node) {
     return (
@@ -74,7 +85,7 @@ export function NodeInspector({ node }: NodeInspectorProps) {
           <Separator />
 
           <div className="space-y-2">
-            <Label htmlFor="node-label">Label</Label>
+            <Label htmlFor="node-label">{t("label")}</Label>
             <Input
               id="node-label"
               value={node.data.label}
@@ -84,10 +95,10 @@ export function NodeInspector({ node }: NodeInspectorProps) {
 
           {node.data.type === "navigate" && (
             <div className="space-y-2">
-              <Label htmlFor="node-url">URL</Label>
+              <Label htmlFor="node-url">{t("url")}</Label>
               <Input
                 id="node-url"
-                placeholder="https://example.com"
+                placeholder={t("urlPlaceholder")}
                 value={(node.data.config?.url as string) || ""}
                 onChange={(e) =>
                   updateNodeData(node.id, {
@@ -100,10 +111,10 @@ export function NodeInspector({ node }: NodeInspectorProps) {
 
           {(node.data.type === "click" || node.data.type === "type" || node.data.type === "wait_for") && (
             <div className="space-y-2">
-              <Label htmlFor="node-selector">CSS Selector</Label>
+              <Label htmlFor="node-selector">{t("selector")}</Label>
               <Input
                 id="node-selector"
-                placeholder="#element, .class, [data-id]"
+                placeholder={t("selectorPlaceholder")}
                 value={(node.data.config?.selector as string) || ""}
                 onChange={(e) =>
                   updateNodeData(node.id, {
@@ -116,10 +127,10 @@ export function NodeInspector({ node }: NodeInspectorProps) {
 
           {node.data.type === "type" && (
             <div className="space-y-2">
-              <Label htmlFor="node-text">Text to Type</Label>
+              <Label htmlFor="node-text">{t("textToType")}</Label>
               <Textarea
                 id="node-text"
-                placeholder="Enter text..."
+                placeholder={t("textPlaceholder")}
                 value={(node.data.config?.text as string) || ""}
                 onChange={(e) =>
                   updateNodeData(node.id, {
@@ -132,11 +143,11 @@ export function NodeInspector({ node }: NodeInspectorProps) {
 
           {node.data.type === "delay" && (
             <div className="space-y-2">
-              <Label htmlFor="node-delay">Delay (ms)</Label>
+              <Label htmlFor="node-delay">{t("delayMs")}</Label>
               <Input
                 id="node-delay"
                 type="number"
-                placeholder="1000"
+                placeholder={t("delayPlaceholder")}
                 value={(node.data.config?.delay as number) || ""}
                 onChange={(e) =>
                   updateNodeData(node.id, {
@@ -149,10 +160,10 @@ export function NodeInspector({ node }: NodeInspectorProps) {
 
           {node.data.type === "llm_chat" && (
             <div className="space-y-2">
-              <Label htmlFor="node-prompt">Prompt</Label>
+              <Label htmlFor="node-prompt">{t("prompt")}</Label>
               <Textarea
                 id="node-prompt"
-                placeholder="Enter your prompt..."
+                placeholder={t("promptPlaceholder")}
                 rows={4}
                 value={(node.data.config?.prompt as string) || ""}
                 onChange={(e) =>
@@ -170,13 +181,36 @@ export function NodeInspector({ node }: NodeInspectorProps) {
             variant="destructive"
             size="sm"
             className="w-full"
-            onClick={() => deleteNode(node.id)}
+            onClick={() => setIsDeleteDialogOpen(true)}
           >
             <Icon icon="lucide:trash-2" className="mr-2 h-4 w-4" />
-            Delete Node
+            {t("deleteNode")}
           </Button>
         </div>
       </ScrollArea>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("deleteConfirm.title")}</DialogTitle>
+            <DialogDescription>{t("deleteConfirm.description")}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              {tCommon("cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                deleteNode(node.id)
+                setIsDeleteDialogOpen(false)
+              }}
+            >
+              {tCommon("delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

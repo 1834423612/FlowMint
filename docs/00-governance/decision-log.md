@@ -16,6 +16,14 @@
 
 ## Entries
 
+### Decision 2026-03-09-007
+- Title: 将 Next.js 升级到 16.1.6 以满足 Vercel CVE 安全门禁
+- Status: accepted
+- Context: Vercel 构建报错 `Vulnerable version of Next.js detected`（CVE-2025-66478），当前 `next@15.2.4` 被平台拒绝部署。
+- Decision: 升级 `next` 到 `16.1.6`（latest）并以 `pnpm build` 通过作为回归基线。
+- Consequences: 消除部署阻塞与已知漏洞版本风险；`tsconfig.json` 被 Next 自动补充 dev types include 与 JSX 设置。
+- Related files: `package.json`, `pnpm-lock.yaml`, `tsconfig.json`
+
 ### Decision 2026-03-09-005
 - Title: 工作流验证采用分层验证策略
 - Status: accepted

@@ -22,6 +22,7 @@ interface HeaderProps {
 export function Header({ title }: HeaderProps) {
   const t = useTranslations("user")
   const tNav = useTranslations("nav")
+  const tCommon = useTranslations("common")
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -35,7 +36,7 @@ export function Header({ title }: HeaderProps) {
           />
           <Input
             type="search"
-            placeholder="Search..."
+            placeholder={tCommon("search")}
             className="w-64 pl-9"
           />
         </div>
@@ -48,7 +49,7 @@ export function Header({ title }: HeaderProps) {
 
         <Button variant="ghost" size="icon">
           <Icon icon="lucide:bell" className="h-4 w-4" />
-          <span className="sr-only">Notifications</span>
+          <span className="sr-only">{t("notifications")}</span>
         </Button>
 
         <DropdownMenu>
@@ -62,7 +63,7 @@ export function Header({ title }: HeaderProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>{t("accountMenu")}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <Icon icon="lucide:user" className="mr-2 h-4 w-4" />

@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { Icon } from "@iconify/react"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
@@ -13,6 +14,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 export type WorkflowStatus = "draft" | "active" | "paused" | "archived"
 
@@ -42,6 +51,8 @@ interface WorkflowCardProps {
 
 export function WorkflowCard({ workflow, onRun, onDelete }: WorkflowCardProps) {
   const t = useTranslations("workflows")
+  const tCommon = useTranslations("common")
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   return (
     <Card className="group flex flex-col transition-colors hover:border-primary/50">
@@ -74,7 +85,7 @@ export function WorkflowCard({ workflow, onRun, onDelete }: WorkflowCardProps) {
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <Icon icon="lucide:git-commit" className="h-3 w-3" />
-            <span>{workflow.nodeCount} nodes</span>
+            <span>{workflow.nodeCount} {t("nodeCountUnit")}</span>
           </div>
           {workflow.lastRun && (
             <div className="flex items-center gap-1">
@@ -105,7 +116,7 @@ export function WorkflowCard({ workflow, onRun, onDelete }: WorkflowCardProps) {
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
               <Icon icon="lucide:more-horizontal" className="h-3 w-3" />
-              <span className="sr-only">More actions</span>
+              <span className="sr-only">{tCommon("actions")}</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -120,13 +131,36 @@ export function WorkflowCard({ workflow, onRun, onDelete }: WorkflowCardProps) {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-destructive-foreground"
-              onClick={() => onDelete?.(workflow.id)}
+              onClick={() => setIsDeleteDialogOpen(true)}
             >
               <Icon icon="lucide:trash-2" className="mr-2 h-4 w-4" />
               {t("actions.delete")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{t("deleteConfirm.title")}</DialogTitle>
+              <DialogDescription>{t("deleteConfirm.description")}</DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                {tCommon("cancel")}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  onDelete?.(workflow.id)
+                  setIsDeleteDialogOpen(false)
+                }}
+              >
+                {tCommon("delete")}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </CardFooter>
     </Card>
   )

@@ -75,7 +75,8 @@
     "deleteConfirm": {
       "title": "删除工作流",
       "description": "确定要删除此工作流吗？此操作无法撤销。"
-    }
+    },
+    "nodeCountUnit": "个节点"
   },
   "editor": {
     "title": "工作流编辑器",
@@ -149,7 +150,23 @@
       "noSelection": "选择一个节点来查看和编辑其属性",
       "nodeId": "节点 ID",
       "nodeType": "节点类型",
-      "properties": "属性"
+      "properties": "属性",
+      "label": "标签",
+      "url": "URL",
+      "urlPlaceholder": "https://example.com",
+      "selector": "CSS 选择器",
+      "selectorPlaceholder": "#element, .class, [data-id]",
+      "textToType": "输入文本",
+      "textPlaceholder": "请输入文本...",
+      "delayMs": "延迟（毫秒）",
+      "delayPlaceholder": "1000",
+      "prompt": "提示词",
+      "promptPlaceholder": "请输入提示词...",
+      "deleteNode": "删除节点",
+      "deleteConfirm": {
+        "title": "删除节点",
+        "description": "确定要删除该节点吗？相关连线也会一起删除。"
+      }
     }
   },
   "executions": {
@@ -177,6 +194,15 @@
       "logs": "执行日志",
       "result": "执行结果",
       "error": "错误信息"
+    },
+    "filters": {
+      "statusPlaceholder": "状态",
+      "allStatuses": "全部状态"
+    },
+    "triggers": {
+      "manual": "手动",
+      "schedule": "定时",
+      "webhook": "Webhook"
     }
   },
   "settings": {
@@ -199,7 +225,9 @@
   "user": {
     "profile": "个人资料",
     "preferences": "偏好设置",
-    "logout": "退出登录"
+    "logout": "退出登录",
+    "notifications": "通知",
+    "accountMenu": "我的账户"
   },
   "providers": {
     "title": "AI 提供商",
